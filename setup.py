@@ -13,23 +13,23 @@ def get_long_description():
 
 
 setup(
-    name="pyseek",
+    name="symbex",
     description="Find the Python code for specified symbols",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     author="Simon Willison",
-    url="https://github.com/simonw/pyseek",
+    url="https://github.com/simonw/symbex",
     project_urls={
-        "Issues": "https://github.com/simonw/pyseek/issues",
-        "CI": "https://github.com/simonw/pyseek/actions",
-        "Changelog": "https://github.com/simonw/pyseek/releases",
+        "Issues": "https://github.com/simonw/symbex/issues",
+        "CI": "https://github.com/simonw/symbex/actions",
+        "Changelog": "https://github.com/simonw/symbex/releases",
     },
     license="Apache License, Version 2.0",
     version=VERSION,
-    packages=["pyseek"],
+    packages=["symbex"],
     entry_points="""
         [console_scripts]
-        pyseek=pyseek.cli:cli
+        symbex=symbex.cli:cli
     """,
     install_requires=["click"],
     extras_require={"test": ["pytest", "pytest-icdiff"]},

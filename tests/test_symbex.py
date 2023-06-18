@@ -2,7 +2,7 @@ import pathlib
 import pytest
 from click.testing import CliRunner
 
-from pyseek.cli import cli
+from symbex.cli import cli
 
 
 @pytest.fixture

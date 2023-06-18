@@ -26,16 +26,16 @@ def cli(symbols, files, directories):
 
     \b
         # Search current directory and subdirectories
-        pyseek my_function MyClass
+        symbex my_function MyClass
     \b
         # Search using a wildcard
-        pyseek 'test_*'
+        symbex 'test_*'
     \b
         # Search a specific file
-        pyseek MyClass -f my_file.py
+        symbex MyClass -f my_file.py
     \b
         # Search within a specific directory and its subdirectories
-        pyseek Database -d ~/projects/datasette
+        symbex Database -d ~/projects/datasette
 
     """
     if not files and not directories:

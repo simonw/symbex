@@ -1,9 +1,9 @@
-# pyseek
+# symbex
 
-[![PyPI](https://img.shields.io/pypi/v/pyseek.svg)](https://pypi.org/project/pyseek/)
-[![Changelog](https://img.shields.io/github/v/release/simonw/pyseek?include_prereleases&label=changelog)](https://github.com/simonw/pyseek/releases)
-[![Tests](https://github.com/simonw/pyseek/workflows/Test/badge.svg)](https://github.com/simonw/pyseek/actions?query=workflow%3ATest)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/simonw/pyseek/blob/master/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/symbex.svg)](https://pypi.org/project/symbex/)
+[![Changelog](https://img.shields.io/github/v/release/simonw/symbex?include_prereleases&label=changelog)](https://github.com/simonw/symbex/releases)
+[![Tests](https://github.com/simonw/symbex/workflows/Test/badge.svg)](https://github.com/simonw/symbex/actions?query=workflow%3ATest)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/simonw/symbex/blob/master/LICENSE)
 
 Find the Python code for specified symbols
 
@@ -11,33 +11,33 @@ Find the Python code for specified symbols
 
 Install this tool using `pip`:
 ```bash
-pip install pyseek
+pip install symbex
 ```
 ## Usage
 
-`pyseek` can search for names of functions and classes that occur at the top level of a Python file.
+`symbex` can search for names of functions and classes that occur at the top level of a Python file.
 
 To search every `.py` file in your current directory and all subdirectories, run like this:
 
 ```bash
-pyseek my_function
+symbex my_function
 ```
 You can search for more than one symbol at a time:
 ```bash
-pyseek my_function MyClass
+symbex my_function MyClass
 ```
 Wildcards are supported - to search for every `test_` function run this (note the single quotes to avoid the shell interpreting the `*` as a wildcard):
 ```bash
-pyseek 'test_*'
+symbex 'test_*'
 ```
 To search within a specific file, pass that file using the `-f` option. You can pass this more than once to search multiple files.
 
 ```bash
-pyseek MyClass -f my_file.py
+symbex MyClass -f my_file.py
 ```
 To search within a specific directory and all of its subdirectories, use the `-d` option:
 ```bash
-pyseek Database -d ~/projects/datasette
+symbex Database -d ~/projects/datasette
 ```
 
 ## Example output
@@ -45,7 +45,7 @@ pyseek Database -d ~/projects/datasette
 In a fresh checkout of [Datasette](https://github.com/simonw/datasette) I ran this command:
 
 ```bash
-pyseek MessagesDebugView get_long_description
+symbex MessagesDebugView get_long_description
 ```
 Here's the output of the command:
 ```
@@ -74,12 +74,12 @@ class PatternPortfolioView(View):
 
 This tool is primarily designed to be used with [LLM](https://llm.datasette.io/), a CLI tool for working with Large Language Models.
 
-`pyseek` makes it easy to grab a specific class or function and pass it to the `llm` command.
+`symbex` makes it easy to grab a specific class or function and pass it to the `llm` command.
 
 For example, I ran this in the Datasette repository root:
 
 ```bash
-pyseek Response | llm --system 'Explain this code, succinctly'
+symbex Response | llm --system 'Explain this code, succinctly'
 ```
 And got back this:
 
@@ -90,7 +90,7 @@ And got back this:
 
 To contribute to this tool, first checkout the code. Then create a new virtual environment:
 ```bash
-cd pyseek
+cd symbex
 python -m venv venv
 source venv/bin/activate
 ```
