@@ -11,7 +11,7 @@ Find the Python code for specified symbols
 
 Install this tool using `pip`:
 ```bash
-pip install https://github.com/simonw/pyseek/archive/refs/tags/0.1.2.zip
+pip install pyseek
 ```
 ## Usage
 
