@@ -26,6 +26,10 @@ You can search for more than one symbol at a time:
 ```bash
 py-grep my_function MyClass
 ```
+Wildcards are supported - to search for every `test_` function run this (note the single quotes to avoid the shell interpreting the `*` as a wildcard):
+```bash
+py-grep 'test_*'
+```
 To search within a specific file, pass that file using the `-f` option. You can pass this more than once to search multiple files.
 
 ```bash
