@@ -24,14 +24,19 @@ def cli(symbols, files, directories):
 
     Example usage:
 
+    \b
         # Search current directory and subdirectories
-        py-grep my_function
-
+        py-grep my_function MyClass
+    \b
+        # Search using a wildcard
+        py-grep 'test_*'
+    \b
         # Search a specific file
         py-grep MyClass -f my_file.py
-
+    \b
         # Search within a specific directory and its subdirectories
         py-grep Database -d ~/projects/datasette
+
     """
     if not files and not directories:
         directories = ["."]
