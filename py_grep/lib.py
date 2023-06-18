@@ -17,9 +17,13 @@ def find_symbol_nodes(code: str, symbols: Iterable[str]) -> Iterable[AST]:
 def code_for_node(code: str, node: AST) -> Tuple[str, int]:
     "Returns the code for a given node"
     lines = code.split("\n")
-    start = node.lineno - 1
+    # If the node has decorator_list, include those too
+    if getattr(node, "decorator_list", None):
+        start = node.decorator_list[0].lineno - 1
+    else:
+        start = node.lineno - 1
     end = node.end_lineno
-    return "\n".join(lines[start:end]), node.lineno
+    return "\n".join(lines[start:end]), start + 1
 
 
 def match(name: str, symbols: Iterable[str]) -> bool:
