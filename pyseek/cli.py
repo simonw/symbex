@@ -26,16 +26,16 @@ def cli(symbols, files, directories):
 
     \b
         # Search current directory and subdirectories
-        py-grep my_function MyClass
+        pyseek my_function MyClass
     \b
         # Search using a wildcard
-        py-grep 'test_*'
+        pyseek 'test_*'
     \b
         # Search a specific file
-        py-grep MyClass -f my_file.py
+        pyseek MyClass -f my_file.py
     \b
         # Search within a specific directory and its subdirectories
-        py-grep Database -d ~/projects/datasette
+        pyseek Database -d ~/projects/datasette
 
     """
     if not files and not directories:

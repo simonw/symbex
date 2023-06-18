@@ -13,23 +13,23 @@ def get_long_description():
 
 
 setup(
-    name="py-grep",
+    name="pyseek",
     description="Find the Python code for specified symbols",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     author="Simon Willison",
-    url="https://github.com/simonw/py-grep",
+    url="https://github.com/simonw/pyseek",
     project_urls={
-        "Issues": "https://github.com/simonw/py-grep/issues",
-        "CI": "https://github.com/simonw/py-grep/actions",
-        "Changelog": "https://github.com/simonw/py-grep/releases",
+        "Issues": "https://github.com/simonw/pyseek/issues",
+        "CI": "https://github.com/simonw/pyseek/actions",
+        "Changelog": "https://github.com/simonw/pyseek/releases",
     },
     license="Apache License, Version 2.0",
     version=VERSION,
-    packages=["py_grep"],
+    packages=["pyseek"],
     entry_points="""
         [console_scripts]
-        py-grep=py_grep.cli:cli
+        pyseek=pyseek.cli:cli
     """,
     install_requires=["click"],
     extras_require={"test": ["pytest", "pytest-icdiff"]},
