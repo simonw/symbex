@@ -11,7 +11,7 @@ Find the Python code for specified symbols
 
 Install this tool using `pip`:
 ```bash
-pip install https://github.com/simonw/py-grep/archive/refs/tags/0.1.zip
+pip install https://github.com/simonw/py-grep/archive/refs/tags/0.1.1.zip
 ```
 ## Usage
 
