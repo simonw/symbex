@@ -33,5 +33,5 @@ setup(
     """,
     install_requires=["click"],
     extras_require={"test": ["pytest", "pytest-icdiff"]},
-    python_requires=">=3.7",
+    python_requires=">=3.8",
 )
