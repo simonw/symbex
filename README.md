@@ -117,7 +117,7 @@ cog.out(
 # File: symbex/cli.py Line: 37
 def cli(symbols, files, directories, signatures, silent)
 
-# File: symbex/lib.py Line: 150
+# File: symbex/lib.py Line: 154
 def class_definition(class_def)
 
 # File: symbex/lib.py Line: 32

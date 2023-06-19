@@ -27,5 +27,4 @@ jobs:
         pytest
     - name: Check if cog needs to be run
       run: |
-        cog README.md
-        # cog --check README.md
+        cog --check README.md
