@@ -35,16 +35,6 @@ def directory_full_of_code(tmpdir):
             ["baz", "--silent"],
             "# File: nested/baz.py Line: 1\ndef baz():\n    pass\n\n",
         ),
-        # Test without --silent to see errors
-        (
-            ["baz"],
-            (
-                "# File: nested/baz.py Line: 1\n"
-                "def baz():\n"
-                "    pass\n\n"
-                "# Syntax error in nested/error.py: expected ':' (<unknown>, line 1)\n"
-            ),
-        ),
         # The -f option
         (
             ["baz", "-f", "nested/baz.py", "--silent"],
@@ -63,3 +53,16 @@ def test_fixture(directory_full_of_code, args, expected, monkeypatch):
     result = runner.invoke(cli, args, catch_exceptions=False)
     assert result.exit_code == 0
     assert result.stdout == expected
+
+
+def test_errors(directory_full_of_code, monkeypatch):
+    # Test without --silent to see errors
+    runner = CliRunner(mix_stderr=False)
+    monkeypatch.chdir(directory_full_of_code)
+    result = runner.invoke(cli, ["baz"], catch_exceptions=False)
+    assert result.exit_code == 0
+    assert result.stdout == (
+        "# File: nested/baz.py Line: 1\n" "def baz():\n" "    pass\n\n"
+    )
+    # This differs between different Python versions
+    assert result.stderr.startswith("# Syntax error in nested/error.py:")
