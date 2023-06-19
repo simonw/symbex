@@ -170,3 +170,22 @@ To run the tests:
 ```bash
 pytest
 ```
+### just
+
+You can also install [just](https://github.com/casey/just) and use it to run the tests and linters like this:
+
+```bash
+just
+```
+Or to list commands:
+```bash
+just -l
+```
+```
+Available recipes:
+    black         # Apply Black
+    cog           # Rebuild docs with cog
+    default       # Run tests and linters
+    lint          # Run linters
+    test *options # Run pytest with supplied options
+```
