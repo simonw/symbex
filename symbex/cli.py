@@ -24,11 +24,17 @@ from .lib import code_for_node, find_symbol_nodes
     help="Directories to search",
 )
 @click.option(
+    "-s",
+    "--signatures",
+    is_flag=True,
+    help="Show just function and class signatures",
+)
+@click.option(
     "--silent",
     is_flag=True,
     help="Silently ignore Python files with parse errors",
 )
-def cli(symbols, files, directories, silent):
+def cli(symbols, files, directories, signatures, silent):
     """
     Find symbols in Python code and print the code for them.
 
@@ -48,6 +54,8 @@ def cli(symbols, files, directories, silent):
         symbex Database -d ~/projects/datasette
 
     """
+    if signatures and not symbols:
+        symbols = ["*"]
     if not files and not directories:
         directories = ["."]
     files = [pathlib.Path(f) for f in files]
@@ -69,7 +77,7 @@ def cli(symbols, files, directories, silent):
                 path = file.resolve().relative_to(pwd)
             else:
                 path = file.resolve()
-            snippet, line_no = code_for_node(code, node)
+            snippet, line_no = code_for_node(code, node, signatures)
             print("# File:", path, "Line:", line_no)
             print(snippet)
             print()

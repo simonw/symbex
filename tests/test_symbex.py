@@ -47,12 +47,36 @@ def directory_full_of_code(tmpdir):
         ),
     ),
 )
-def test_fixture(directory_full_of_code, args, expected, monkeypatch):
+def test_fixture(directory_full_of_code, monkeypatch, args, expected):
     runner = CliRunner()
     monkeypatch.chdir(directory_full_of_code)
     result = runner.invoke(cli, args, catch_exceptions=False)
     assert result.exit_code == 0
     assert result.stdout == expected
+
+
+@pytest.mark.parametrize(
+    "args,expected",
+    (
+        (
+            ["foo*", "--silent"],
+            "# File: foo.py Line: 1\n"
+            "def foo1()\n"
+            "\n"
+            "# File: foo.py Line: 5\n"
+            "def foo2()",
+        ),
+        (["BarClass", "--silent"], "# File: bar.py Line: 1\n" "class BarClass"),
+        (["baz", "--silent"], ("# File: nested/baz.py Line: 1\n" "def baz()")),
+    ),
+)
+def test_symbex_symbols(directory_full_of_code, monkeypatch, args, expected):
+    runner = CliRunner()
+    monkeypatch.chdir(directory_full_of_code)
+    result = runner.invoke(cli, args + ["-s"], catch_exceptions=False)
+    assert result.exit_code == 0
+    # Here expected is just the first two lines
+    assert result.stdout.strip() == expected
 
 
 def test_errors(directory_full_of_code, monkeypatch):
