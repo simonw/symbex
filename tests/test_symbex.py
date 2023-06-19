@@ -11,7 +11,7 @@ def directory_full_of_code(tmpdir):
     for path, content in (
         ("foo.py", "def foo1():\n    pass\n\n@decorated\ndef foo2():\n    pass\n\n"),
         ("bar.py", "class BarClass:\n    pass\n\n"),
-        ("nested/baz.py", "def baz():\n    pass\n\n"),
+        ("nested/baz.py", 'def baz(delimiter=", ", type=str):\n    pass\n\n'),
         ("nested/error.py", "def baz_error()" + "bug:\n    pass\n\n"),
         (
             "methods.py",
@@ -60,7 +60,7 @@ def directory_full_of_code(tmpdir):
         ),
         (
             ["baz", "--silent"],
-            "# File: nested/baz.py Line: 1\ndef baz():\n    pass\n\n",
+            '# File: nested/baz.py Line: 1\ndef baz(delimiter=", ", type=str):\n    pass\n\n',
         ),
         (
             ["async_func", "--silent"],
@@ -69,12 +69,12 @@ def directory_full_of_code(tmpdir):
         # The -f option
         (
             ["baz", "-f", "nested/baz.py", "--silent"],
-            "# File: nested/baz.py Line: 1\ndef baz():\n    pass\n\n",
+            '# File: nested/baz.py Line: 1\ndef baz(delimiter=", ", type=str):\n    pass\n\n',
         ),
         # The -d option
         (
             ["baz", "-d", "nested", "--silent"],
-            "# File: nested/baz.py Line: 1\ndef baz():\n    pass\n\n",
+            '# File: nested/baz.py Line: 1\ndef baz(delimiter=", ", type=str):\n    pass\n\n',
         ),
         # Classes
         (
@@ -144,7 +144,10 @@ def test_fixture(directory_full_of_code, monkeypatch, args, expected):
             "def foo2()",
         ),
         (["BarClass", "--silent"], "# File: bar.py Line: 1\n" "class BarClass"),
-        (["baz", "--silent"], ("# File: nested/baz.py Line: 1\n" "def baz()")),
+        (
+            ["baz", "--silent"],
+            ("# File: nested/baz.py Line: 1\n" 'def baz(delimiter=", ", type=str)'),
+        ),
     ),
 )
 def test_symbex_symbols(directory_full_of_code, monkeypatch, args, expected):
@@ -162,8 +165,11 @@ def test_errors(directory_full_of_code, monkeypatch):
     monkeypatch.chdir(directory_full_of_code)
     result = runner.invoke(cli, ["baz"], catch_exceptions=False)
     assert result.exit_code == 0
-    assert result.stdout == (
-        "# File: nested/baz.py Line: 1\n" "def baz():\n" "    pass\n\n"
+    expected = (
+        "# File: nested/baz.py Line: 1\n"
+        'def baz(delimiter=", ", type=str):\n'
+        "    pass\n\n"
     )
+    assert result.stdout == expected
     # This differs between different Python versions
     assert result.stderr.startswith("# Syntax error in nested/error.py:")

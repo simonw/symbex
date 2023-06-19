@@ -112,6 +112,8 @@ def function_definition(function_node: AST):
     for default in function_node.args.defaults:
         try:
             value = literal_eval(default)
+            if isinstance(value, str):
+                value = f'"{value}"'
         except ValueError:
             value = getattr(default, "id", "...")
         defaults.append(value)
