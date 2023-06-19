@@ -30,6 +30,20 @@ Wildcards are supported - to search for every `test_` function run this (note th
 ```bash
 symbex 'test_*'
 ```
+To search for methods within classes, use `class.method` notation:
+```bash
+symbex Entry.get_absolute_url
+```
+Wildcards are supported here as well:
+```bash
+symbex 'Entry.*'
+symbex '*.get_absolute_url'
+symbex '*.get_*'
+```
+Or to view every method of every class:
+```bash
+symbex '*.*'
+```
 To search within a specific file, pass that file using the `-f` option. You can pass this more than once to search multiple files.
 
 ```bash
