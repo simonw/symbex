@@ -82,16 +82,40 @@ The `-s/--signatures` option will list just the signatures of the functions and 
 ```bash
 symbex -s -d symbex
 ```
+
+<!-- [[[cog
+import cog
+from click.testing import CliRunner
+import pathlib
+from symbex.cli import cli
+
+path = pathlib.Path("symbex").resolve()
+runner = CliRunner()
+result = runner.invoke(cli, ["-s", "-d", str(path)])
+cog.out(
+    "```\n{}\n```\n".format(result.stdout.strip())
+)
+]]] -->
 ```
-# File: symbex/lib.py Line: 7
+# File: symbex/lib.py Line: 8
 def find_symbol_nodes(code: str, symbols)
 
-# File: symbex/lib.py Line: 18
-def code_for_node(code: str, node: AST, signatures: bool)
+# File: symbex/lib.py Line: 30
+def code_for_node(code: str, node: AST, class_name: str, signatures: bool)
 
-# File: symbex/lib.py Line: 42
+# File: symbex/lib.py Line: 61
 def match(name: str, symbols) -> bool
+
+# File: symbex/lib.py Line: 76
+def function_definition(function_node: AST)
+
+# File: symbex/lib.py Line: 138
+def class_definition(class_def)
+
+# File: symbex/cli.py Line: 37
+def cli(symbols, files, directories, signatures, silent)
 ```
+<!-- [[[end]]] -->
 This can be combined with other options, or you can run `symbex -s` to see every symbol in the current directory and its subdirectories.
 
 ## Using with LLM
