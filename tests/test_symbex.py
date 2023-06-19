@@ -4,6 +4,7 @@ import textwrap
 from click.testing import CliRunner
 
 from symbex.cli import cli
+from symbex.lib import read_file
 
 
 def test_no_args_shows_help():
@@ -180,3 +181,20 @@ def test_errors(directory_full_of_code, monkeypatch):
     assert result.stdout == expected
     # This differs between different Python versions
     assert result.stderr.startswith("# Syntax error in nested.py/error.py:")
+
+
+def test_read_file_with_encoding(tmpdir):
+    # https://github.com/simonw/symbex/issues/18#issuecomment-1597546242
+    path = tmpdir / "encoded.py"
+    path.write_binary(
+        b"# coding: iso-8859-5\n# (Unlikely to be the default encoding for most testers.)\n"
+        b"# \xb1\xb6\xff\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef <- Cyrillic characters\n"
+        b'u = "\xae\xe2\xf0\xc4"\n'
+    )
+    text = read_file(path)
+    assert text == (
+        "# coding: iso-8859-5\n"
+        "# (Unlikely to be the default encoding for most testers.)\n"
+        "# БЖџрстуфхцчшщъыьэюя <- Cyrillic characters\n"
+        'u = "Ўт№Ф"\n'
+    )

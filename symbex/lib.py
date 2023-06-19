@@ -1,8 +1,9 @@
 import fnmatch
 import ast
 from ast import literal_eval, parse, AST, AsyncFunctionDef, FunctionDef, ClassDef
+import codecs
 from itertools import zip_longest
-import textwrap
+import re
 from typing import Iterable, List, Optional, Tuple
 
 
@@ -204,3 +205,28 @@ def annotation_definition(annotation: AST) -> str:
         return f"({elements})"
     else:
         return "?"
+
+
+def read_file(path):
+    encoding_pattern = r"^[ \t\f]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)"
+    default_encoding = "utf-8"
+
+    with open(path, "r", encoding=default_encoding, errors="ignore") as f:
+        first_512_bytes = f.read(512)
+        first_two_lines = "\n".join(first_512_bytes.split("\n")[:2])
+
+        match = re.search(encoding_pattern, first_two_lines, re.MULTILINE)
+        if match:
+            encoding = match.group(1)
+        else:
+            encoding = default_encoding
+
+    try:
+        with codecs.open(path, "r", encoding=encoding) as f:
+            content = f.read()
+    except LookupError:
+        # If the detected encoding is not valid, try again with utf-8
+        with codecs.open(path, "r", encoding=default_encoding) as f:
+            content = f.read()
+
+    return content
