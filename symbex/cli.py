@@ -70,6 +70,10 @@ def cli(symbols, files, directories, signatures, silent):
         # View signatures for all test functions
         symbex 'test_*' -s
     """
+    if not symbols and not signatures:
+        ctx = click.get_current_context()
+        click.echo(ctx.get_help())
+        ctx.exit()
     if signatures and not symbols:
         symbols = ["*"]
     if not files and not directories:

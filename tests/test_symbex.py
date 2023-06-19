@@ -6,6 +6,13 @@ from click.testing import CliRunner
 from symbex.cli import cli
 
 
+def test_no_args_shows_help():
+    runner = CliRunner()
+    result = runner.invoke(cli, catch_exceptions=False)
+    assert result.exit_code == 0
+    assert "Usage: cli [OPTIONS]" in result.stdout
+
+
 @pytest.fixture
 def directory_full_of_code(tmpdir):
     for path, content in (
