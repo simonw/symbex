@@ -77,14 +77,18 @@ def cli(symbols, files, directories, signatures, silent):
             if not silent:
                 click.secho(f"# Syntax error in {file}: {ex}", err=True, fg="yellow")
             continue
-        for node in nodes:
+        for node, class_name in nodes:
             # If file is within pwd, print relative path
             # else print absolute path
             if pwd in file.resolve().parents:
                 path = file.resolve().relative_to(pwd)
             else:
                 path = file.resolve()
-            snippet, line_no = code_for_node(code, node, signatures)
-            print("# File:", path, "Line:", line_no)
+            snippet, line_no = code_for_node(code, node, class_name, signatures)
+            bits = ["# File:", path]
+            if class_name:
+                bits.extend(["Class:", class_name])
+            bits.extend(["Line:", line_no])
+            print(*bits)
             print(snippet)
             print()

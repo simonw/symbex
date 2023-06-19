@@ -64,3 +64,18 @@ class ClassMultipleBase(int, str):
 # Class with a metaclass
 class ClassWithMeta(metaclass=type):
     pass
+
+
+# Class with methods
+class ClassWithMethods:
+    def __init__(self, a):
+        pass
+
+    def method_types(self, b: int) -> bool:
+        return True
+
+    def method_positional_only_args(a, /, b, c):
+        pass
+
+    def method_keyword_only_args(a, *, b, c):
+        pass

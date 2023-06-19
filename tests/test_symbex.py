@@ -1,5 +1,6 @@
 import pathlib
 import pytest
+import textwrap
 from click.testing import CliRunner
 
 from symbex.cli import cli
@@ -12,6 +13,19 @@ def directory_full_of_code(tmpdir):
         ("bar.py", "class BarClass:\n    pass\n\n"),
         ("nested/baz.py", "def baz():\n    pass\n\n"),
         ("nested/error.py", "def baz_error()" + "bug:\n    pass\n\n"),
+        (
+            "methods.py",
+            textwrap.dedent(
+                """
+        class MyClass:
+            def __init__(self, a):
+                self.a = a
+
+            def method1(self, a=1):
+                pass
+        """
+            ),
+        ),
     ):
         p = pathlib.Path(tmpdir / path)
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -44,6 +58,43 @@ def directory_full_of_code(tmpdir):
         (
             ["baz", "-d", "nested", "--silent"],
             "# File: nested/baz.py Line: 1\ndef baz():\n    pass\n\n",
+        ),
+        # Classes
+        (
+            ["MyClass", "--silent"],
+            "# File: methods.py Line: 2\n"
+            "class MyClass:\n"
+            "    def __init__(self, a):\n"
+            "        self.a = a\n"
+            "\n"
+            "    def method1(self, a=1):\n"
+            "        pass\n"
+            "\n",
+        ),
+        (
+            ["MyClass.__init__", "--silent"],
+            "# File: methods.py Class: MyClass Line: 3\n"
+            "    def __init__(self, a):\n"
+            "        self.a = a\n"
+            "\n",
+        ),
+        (
+            ["MyClass.*", "--silent"],
+            "# File: methods.py Class: MyClass Line: 3\n"
+            "    def __init__(self, a):\n"
+            "        self.a = a\n"
+            "\n"
+            "# File: methods.py Class: MyClass Line: 6\n"
+            "    def method1(self, a=1):\n"
+            "        pass\n"
+            "\n",
+        ),
+        (
+            ["*.method*", "--silent"],
+            "# File: methods.py Class: MyClass Line: 6\n"
+            "    def method1(self, a=1):\n"
+            "        pass\n"
+            "\n",
         ),
     ),
 )

@@ -1,28 +1,47 @@
 import fnmatch
 from ast import literal_eval, parse, AST, FunctionDef, ClassDef
 from itertools import zip_longest
-from typing import Iterable, Tuple
+import textwrap
+from typing import Iterable, List, Optional, Tuple
 
 
-def find_symbol_nodes(code: str, symbols: Iterable[str]) -> Iterable[AST]:
+def find_symbol_nodes(
+    code: str, symbols: Iterable[str]
+) -> List[Tuple[AST, Optional[str]]]:
     "Returns ast Nodes matching symbols"
+    # list of (AST, None-or-class-name)
     matches = []
     module = parse(code)
     for node in module.body:
+        if not isinstance(node, (ClassDef, FunctionDef)):
+            continue
         name = getattr(node, "name", None)
         if match(name, symbols):
-            matches.append(node)
+            matches.append((node, None))
+        # If it's a class search its methods too
+        if isinstance(node, ClassDef):
+            for child in node.body:
+                if isinstance(child, FunctionDef):
+                    qualified_name = f"{name}.{child.name}"
+                    if match(qualified_name, symbols):
+                        matches.append((child, name))
+
     return matches
 
 
-def code_for_node(code: str, node: AST, signatures: bool) -> Tuple[str, int]:
+def code_for_node(
+    code: str, node: AST, class_name: str, signatures: bool
+) -> Tuple[str, int]:
     "Returns the code for a given node"
     lines = code.split("\n")
     start = None
     end = None
     if signatures:
         if isinstance(node, FunctionDef):
-            return function_definition(node), node.lineno
+            definition, lineno = function_definition(node), node.lineno
+            if class_name:
+                definition = "    " + definition
+            return definition, lineno
         elif isinstance(node, ClassDef):
             return class_definition(node), node.lineno
         else:
@@ -36,19 +55,31 @@ def code_for_node(code: str, node: AST, signatures: bool) -> Tuple[str, int]:
         else:
             start = node.lineno - 1
         end = node.end_lineno
-    return "\n".join(lines[start:end]), start + 1
+    output = "\n".join(lines[start:end])
+    # If it's in a class, indent it 4 spaces
+    return output, start + 1
 
 
 def match(name: str, symbols: Iterable[str]) -> bool:
     "Returns True if name matches any of the symbols, resolving wildcards"
     if name is None:
         return False
-    for symbol in symbols:
-        if "*" not in symbol:
-            if name == symbol:
+    for search in symbols:
+        if "*" not in search:
+            # Exact matches only
+            if name == search:
                 return True
+        elif search.count(".") == 1:
+            # wildcards are supported either side of the dot
+            if "." in name:
+                class_match, method_match = search.split(".")
+                class_name, method_name = name.split(".")
+                if fnmatch.fnmatch(class_name, class_match) and fnmatch.fnmatch(
+                    method_name, method_match
+                ):
+                    return True
         else:
-            if fnmatch.fnmatch(name, symbol):
+            if fnmatch.fnmatch(name, search) and "." not in name:
                 return True
 
     return False

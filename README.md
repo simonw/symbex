@@ -30,6 +30,20 @@ Wildcards are supported - to search for every `test_` function run this (note th
 ```bash
 symbex 'test_*'
 ```
+To search for methods within classes, use `class.method` notation:
+```bash
+symbex Entry.get_absolute_url
+```
+Wildcards are supported here as well:
+```bash
+symbex 'Entry.*'
+symbex '*.get_absolute_url'
+symbex '*.get_*'
+```
+Or to view every method of every class:
+```bash
+symbex '*.*'
+```
 To search within a specific file, pass that file using the `-f` option. You can pass this more than once to search multiple files.
 
 ```bash
@@ -92,28 +106,31 @@ from symbex.cli import cli
 path = pathlib.Path("symbex").resolve()
 runner = CliRunner()
 result = runner.invoke(cli, ["-s", "-d", str(path)])
+# Need a consistent sort order
+chunks = result.stdout.strip().split("\n\n")
+chunks.sort()
 cog.out(
-    "```\n{}\n```\n".format(result.stdout.strip())
+    "```\n{}\n```\n".format("\n\n".join(chunks))
 )
 ]]] -->
 ```
+# File: symbex/cli.py Line: 37
+def cli(symbols, files, directories, signatures, silent)
+
+# File: symbex/lib.py Line: 150
+def class_definition(class_def)
+
+# File: symbex/lib.py Line: 32
+def code_for_node(code: str, node: AST, class_name: str, signatures: bool)
+
+# File: symbex/lib.py Line: 63
+def match(name: str, symbols) -> bool
+
 # File: symbex/lib.py Line: 8
 def find_symbol_nodes(code: str, symbols)
 
-# File: symbex/lib.py Line: 30
-def code_for_node(code: str, node: AST, class_name: str, signatures: bool)
-
-# File: symbex/lib.py Line: 61
-def match(name: str, symbols) -> bool
-
-# File: symbex/lib.py Line: 76
+# File: symbex/lib.py Line: 88
 def function_definition(function_node: AST)
-
-# File: symbex/lib.py Line: 138
-def class_definition(class_def)
-
-# File: symbex/cli.py Line: 37
-def cli(symbols, files, directories, signatures, silent)
 ```
 <!-- [[[end]]] -->
 This can be combined with other options, or you can run `symbex -s` to see every symbol in the current directory and its subdirectories.
