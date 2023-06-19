@@ -53,6 +53,13 @@ def cli(symbols, files, directories, signatures, silent):
         # Search within a specific directory and its subdirectories
         symbex Database -d ~/projects/datasette
 
+    \b
+        # View signatures for all symbols in current directory and subdirectories
+        symbex -s
+
+    \b
+        # View signatures for all test functions
+        symbex 'test_*' -s
     """
     if signatures and not symbols:
         symbols = ["*"]

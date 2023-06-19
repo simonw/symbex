@@ -47,8 +47,7 @@ Pass `--silent` to suppress these warnings:
 ```bash
 symbex MyClass --silent
 ```
-
-## Example output
+### Example output
 
 In a fresh checkout of [Datasette](https://github.com/simonw/datasette) I ran this command:
 
@@ -77,6 +76,23 @@ class PatternPortfolioView(View):
             )
         )
 ```
+### Just the signatures
+
+The `-s/--signatures` option will list just the signatures of the functions and classes, for example:
+```bash
+symbex -s -d symbex
+```
+```
+# File: symbex/lib.py Line: 7
+def find_symbol_nodes(code: str, symbols)
+
+# File: symbex/lib.py Line: 18
+def code_for_node(code: str, node: AST, signatures: bool)
+
+# File: symbex/lib.py Line: 42
+def match(name: str, symbols) -> bool
+```
+This can be combined with other options, or you can run `symbex -s` to see every symbol in the current directory and its subdirectories.
 
 ## Using with LLM
 
