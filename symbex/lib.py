@@ -144,7 +144,11 @@ def function_definition(function_node: AST):
             # None shows as returns.value is None
             return_annotation = " -> None"
 
-    return f"def {function_name}({arguments_str}){return_annotation}"
+    def_ = "def "
+    if isinstance(function_node, AsyncFunctionDef):
+        def_ = "async def "
+
+    return f"{def_}{function_name}({arguments_str}){return_annotation}"
 
 
 def class_definition(class_def):
