@@ -100,16 +100,16 @@ cog.out(
 # File: symbex/lib.py Line: 8
 def find_symbol_nodes(code: str, symbols)
 
-# File: symbex/lib.py Line: 30
+# File: symbex/lib.py Line: 32
 def code_for_node(code: str, node: AST, class_name: str, signatures: bool)
 
-# File: symbex/lib.py Line: 61
+# File: symbex/lib.py Line: 63
 def match(name: str, symbols) -> bool
 
-# File: symbex/lib.py Line: 76
+# File: symbex/lib.py Line: 88
 def function_definition(function_node: AST)
 
-# File: symbex/lib.py Line: 138
+# File: symbex/lib.py Line: 150
 def class_definition(class_def)
 
 # File: symbex/cli.py Line: 37
