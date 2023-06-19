@@ -8,7 +8,12 @@ from .lib import code_for_node, find_symbol_nodes
 @click.version_option()
 @click.argument("symbols", nargs=-1)
 @click.option(
-    "files", "-f", "--file", type=click.File("r"), multiple=True, help="Files to search"
+    "files",
+    "-f",
+    "--file",
+    type=click.Path(file_okay=True, dir_okay=False),
+    multiple=True,
+    help="Files to search",
 )
 @click.option(
     "directories",
@@ -45,7 +50,7 @@ def cli(symbols, files, directories, silent):
     """
     if not files and not directories:
         directories = ["."]
-    files = list(files)
+    files = [pathlib.Path(f) for f in files]
     for directory in directories:
         files.extend(pathlib.Path(directory).rglob("*.py"))
     pwd = pathlib.Path(".").resolve()

@@ -35,7 +35,7 @@ def directory_full_of_code(tmpdir):
             ["baz", "--silent"],
             "# File: nested/baz.py Line: 1\ndef baz():\n    pass\n\n",
         ),
-        # Test without -s to see errors
+        # Test without --silent to see errors
         (
             ["baz"],
             (
@@ -44,6 +44,16 @@ def directory_full_of_code(tmpdir):
                 "    pass\n\n"
                 "# Syntax error in nested/error.py: expected ':' (<unknown>, line 1)\n"
             ),
+        ),
+        # The -f option
+        (
+            ["baz", "-f", "nested/baz.py", "--silent"],
+            "# File: nested/baz.py Line: 1\ndef baz():\n    pass\n\n",
+        ),
+        # The -d option
+        (
+            ["baz", "-d", "nested", "--silent"],
+            "# File: nested/baz.py Line: 1\ndef baz():\n    pass\n\n",
         ),
     ),
 )
