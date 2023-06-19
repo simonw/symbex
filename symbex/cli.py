@@ -46,6 +46,15 @@ def cli(symbols, files, directories, signatures, silent):
     \b
         # Search using a wildcard
         symbex 'test_*'
+
+    \b
+        # Find a specific class method
+        symbex 'MyClass.my_method'
+
+    \b
+        # Find class methods using wildcards
+        symbex '*View.handle_*'
+
     \b
         # Search a specific file
         symbex MyClass -f my_file.py
