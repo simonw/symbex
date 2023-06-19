@@ -106,13 +106,19 @@ from symbex.cli import cli
 path = pathlib.Path("symbex").resolve()
 runner = CliRunner()
 result = runner.invoke(cli, ["-s", "-d", str(path)])
+# Need a consistent sort order
+chunks = result.stdout.strip().split("\n\n")
+chunks.sort()
 cog.out(
-    "```\n{}\n```\n".format(result.stdout.strip())
+    "```\n{}\n```\n".format("\n\n".join(chunks))
 )
 ]]] -->
 ```
-# File: symbex/lib.py Line: 8
-def find_symbol_nodes(code: str, symbols)
+# File: symbex/cli.py Line: 37
+def cli(symbols, files, directories, signatures, silent)
+
+# File: symbex/lib.py Line: 150
+def class_definition(class_def)
 
 # File: symbex/lib.py Line: 32
 def code_for_node(code: str, node: AST, class_name: str, signatures: bool)
@@ -120,14 +126,11 @@ def code_for_node(code: str, node: AST, class_name: str, signatures: bool)
 # File: symbex/lib.py Line: 63
 def match(name: str, symbols) -> bool
 
+# File: symbex/lib.py Line: 8
+def find_symbol_nodes(code: str, symbols)
+
 # File: symbex/lib.py Line: 88
 def function_definition(function_node: AST)
-
-# File: symbex/lib.py Line: 150
-def class_definition(class_def)
-
-# File: symbex/cli.py Line: 37
-def cli(symbols, files, directories, signatures, silent)
 ```
 <!-- [[[end]]] -->
 This can be combined with other options, or you can run `symbex -s` to see every symbol in the current directory and its subdirectories.
