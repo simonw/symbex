@@ -18,8 +18,8 @@ def directory_full_of_code(tmpdir):
     for path, content in (
         ("foo.py", "def foo1():\n    pass\n\n@decorated\ndef foo2():\n    pass\n\n"),
         ("bar.py", "class BarClass:\n    pass\n\n"),
-        ("nested/baz.py", 'def baz(delimiter=", ", type=str):\n    pass\n\n'),
-        ("nested/error.py", "def baz_error()" + "bug:\n    pass\n\n"),
+        ("nested.py/baz.py", 'def baz(delimiter=", ", type=str):\n    pass\n\n'),
+        ("nested.py/error.py", "def baz_error()" + "bug:\n    pass\n\n"),
         (
             "methods.py",
             textwrap.dedent(
@@ -67,7 +67,7 @@ def directory_full_of_code(tmpdir):
         ),
         (
             ["baz", "--silent"],
-            '# File: nested/baz.py Line: 1\ndef baz(delimiter=", ", type=str):\n    pass\n\n',
+            '# File: nested.py/baz.py Line: 1\ndef baz(delimiter=", ", type=str):\n    pass\n\n',
         ),
         (
             ["async_func", "--silent"],
@@ -75,13 +75,13 @@ def directory_full_of_code(tmpdir):
         ),
         # The -f option
         (
-            ["baz", "-f", "nested/baz.py", "--silent"],
-            '# File: nested/baz.py Line: 1\ndef baz(delimiter=", ", type=str):\n    pass\n\n',
+            ["baz", "-f", "nested.py/baz.py", "--silent"],
+            '# File: nested.py/baz.py Line: 1\ndef baz(delimiter=", ", type=str):\n    pass\n\n',
         ),
         # The -d option
         (
-            ["baz", "-d", "nested", "--silent"],
-            '# File: nested/baz.py Line: 1\ndef baz(delimiter=", ", type=str):\n    pass\n\n',
+            ["baz", "-d", "nested.py", "--silent"],
+            '# File: nested.py/baz.py Line: 1\ndef baz(delimiter=", ", type=str):\n    pass\n\n',
         ),
         # Classes
         (
@@ -153,7 +153,7 @@ def test_fixture(directory_full_of_code, monkeypatch, args, expected):
         (["BarClass", "--silent"], "# File: bar.py Line: 1\n" "class BarClass"),
         (
             ["baz", "--silent"],
-            ("# File: nested/baz.py Line: 1\n" 'def baz(delimiter=", ", type=str)'),
+            ("# File: nested.py/baz.py Line: 1\n" 'def baz(delimiter=", ", type=str)'),
         ),
     ),
 )
@@ -173,10 +173,10 @@ def test_errors(directory_full_of_code, monkeypatch):
     result = runner.invoke(cli, ["baz"], catch_exceptions=False)
     assert result.exit_code == 0
     expected = (
-        "# File: nested/baz.py Line: 1\n"
+        "# File: nested.py/baz.py Line: 1\n"
         'def baz(delimiter=", ", type=str):\n'
         "    pass\n\n"
     )
     assert result.stdout == expected
     # This differs between different Python versions
-    assert result.stderr.startswith("# Syntax error in nested/error.py:")
+    assert result.stderr.startswith("# Syntax error in nested.py/error.py:")

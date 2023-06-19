@@ -78,11 +78,16 @@ def cli(symbols, files, directories, signatures, silent):
         symbols = ["*"]
     if not files and not directories:
         directories = ["."]
-    files = [pathlib.Path(f) for f in files]
-    for directory in directories:
-        files.extend(pathlib.Path(directory).rglob("*.py"))
+
+    def iterate_files():
+        yield from (pathlib.Path(f) for f in files)
+        for directory in directories:
+            for path in pathlib.Path(directory).rglob("*.py"):
+                if path.is_file():
+                    yield path
+
     pwd = pathlib.Path(".").resolve()
-    for file in files:
+    for file in iterate_files():
         code = file.read_text("utf-8") if hasattr(file, "read_text") else file.read()
         try:
             nodes = find_symbol_nodes(code, symbols)
