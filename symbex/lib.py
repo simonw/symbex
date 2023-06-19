@@ -109,7 +109,12 @@ def function_definition(function_node: AST):
     # if defaults has 2 and args has 3 then those
     # defaults correspond to the last two args
     defaults = [None] * (len(all_args) - len(function_node.args.defaults))
-    defaults.extend(literal_eval(default) for default in function_node.args.defaults)
+    for default in function_node.args.defaults:
+        try:
+            value = literal_eval(default)
+        except ValueError:
+            value = getattr(default, "id", "...")
+        defaults.append(value)
 
     arguments = []
 
