@@ -117,20 +117,23 @@ cog.out(
 # File: symbex/cli.py Line: 37
 def cli(symbols, files, directories, signatures, silent)
 
-# File: symbex/lib.py Line: 167
+# File: symbex/lib.py Line: 157
 def class_definition(class_def)
 
-# File: symbex/lib.py Line: 32
-def code_for_node(code: str, node: AST, class_name: str, signatures: bool)
+# File: symbex/lib.py Line: 191
+def annotation_definition(annotation: AST) -> str
 
-# File: symbex/lib.py Line: 63
-def match(name: str, symbols) -> bool
+# File: symbex/lib.py Line: 33
+def code_for_node(code: str, node: AST, class_name: str, signatures: bool) -> Tuple[(str, int)]
 
-# File: symbex/lib.py Line: 8
-def find_symbol_nodes(code: str, symbols)
+# File: symbex/lib.py Line: 64
+def match(name: str, symbols: Iterable[str]) -> bool
 
-# File: symbex/lib.py Line: 88
+# File: symbex/lib.py Line: 89
 def function_definition(function_node: AST)
+
+# File: symbex/lib.py Line: 9
+def find_symbol_nodes(code: str, filename: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]
 ```
 <!-- [[[end]]] -->
 This can be combined with other options, or you can run `symbex -s` to see every symbol in the current directory and its subdirectories.

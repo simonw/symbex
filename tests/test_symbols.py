@@ -34,7 +34,11 @@ def symbols_text():
         ("ClassWithMeta", "class ClassWithMeta(metaclass=type)"),
         (
             "function_with_non_pep_0484_annotation",
-            "function_with_non_pep_0484_annotation(x, xx, yy, y, zz: float) -> ?",
+            "def function_with_non_pep_0484_annotation(x: ?, xx: ?, yy: ?, y: ?, zz: float) -> ?",
+        ),
+        (
+            "complex_annotations",
+            "complex_annotations(code: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]",
         ),
     ),
 )

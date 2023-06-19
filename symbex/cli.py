@@ -90,7 +90,7 @@ def cli(symbols, files, directories, signatures, silent):
     for file in iterate_files():
         code = file.read_text("utf-8") if hasattr(file, "read_text") else file.read()
         try:
-            nodes = find_symbol_nodes(code, symbols)
+            nodes = find_symbol_nodes(code, str(file), symbols)
         except SyntaxError as ex:
             if not silent:
                 click.secho(f"# Syntax error in {file}: {ex}", err=True, fg="yellow")

@@ -99,3 +99,9 @@ def function_with_non_pep_0484_annotation(
     zz: float,
 ) -> int("42"):
     pass
+
+
+def complex_annotations(
+    code: str, symbols: Iterable[str]
+) -> List[Tuple[AST, Optional[str]]]:
+    pass

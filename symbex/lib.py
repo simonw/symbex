@@ -1,4 +1,5 @@
 import fnmatch
+import ast
 from ast import literal_eval, parse, AST, AsyncFunctionDef, FunctionDef, ClassDef
 from itertools import zip_longest
 import textwrap
@@ -6,7 +7,7 @@ from typing import Iterable, List, Optional, Tuple
 
 
 def find_symbol_nodes(
-    code: str, symbols: Iterable[str]
+    code: str, filename: str, symbols: Iterable[str]
 ) -> List[Tuple[AST, Optional[str]]]:
     "Returns ast Nodes matching symbols"
     # list of (AST, None-or-class-name)
@@ -125,10 +126,9 @@ def function_definition(function_node: AST):
             arguments.append("/")
         if position_of_star and i == position_of_star:
             arguments.append("*")
-        if getattr(arg.annotation, "id", None):
-            arg_str = f"{arg.arg}: {arg.annotation.id}"
-        else:
-            arg_str = arg.arg
+        arg_str = arg.arg
+        if arg.annotation:
+            arg_str += f": {annotation_definition(arg.annotation)}"
 
         if default:
             arg_str = f"{arg_str}={default}"
@@ -145,17 +145,7 @@ def function_definition(function_node: AST):
 
     return_annotation = ""
     if function_node.returns:
-        if hasattr(function_node.returns, "id"):
-            return_annotation = f" -> {function_node.returns.id}"
-        else:
-            try:
-                if function_node.returns.value is None:
-                    # None shows as returns.value is None
-                    return_annotation = " -> None"
-            except AttributeError:
-                # https://github.com/simonw/symbex/issues/16
-                # The return value is something weird like int("42")
-                return_annotation = " -> ?"
+        return_annotation = f" -> {annotation_definition(function_node.returns)}"
 
     def_ = "def "
     if isinstance(function_node, AsyncFunctionDef):
@@ -196,3 +186,21 @@ def class_definition(class_def):
     class_definition = f"class {class_def.name}{signature}"
 
     return class_definition
+
+
+def annotation_definition(annotation: AST) -> str:
+    if annotation is None:
+        return ""
+    elif isinstance(annotation, ast.Name):
+        return annotation.id
+    elif isinstance(annotation, ast.Subscript):
+        value = annotation_definition(annotation.value)
+        slice = annotation_definition(annotation.slice)
+        return f"{value}[{slice}]"
+    elif isinstance(annotation, ast.Index):
+        return annotation_definition(annotation.value)
+    elif isinstance(annotation, ast.Tuple):
+        elements = ", ".join(annotation_definition(e) for e in annotation.elts)
+        return f"({elements})"
+    else:
+        return "?"
