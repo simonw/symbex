@@ -19,7 +19,6 @@ from .lib import code_for_node, find_symbol_nodes
     help="Directories to search",
 )
 @click.option(
-    "-s",
     "--silent",
     is_flag=True,
     help="Silently ignore Python files with parse errors",

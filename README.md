@@ -43,9 +43,9 @@ If `symbex` encounters any Python code that it cannot parse, it will print a war
 ```
 # Syntax error in path/badcode.py: expected ':' (<unknown>, line 1)
 ```
-Pass `-s/--silent` to suppress these warnings:
+Pass `--silent` to suppress these warnings:
 ```bash
-symbex MyClass -s
+symbex MyClass --silent
 ```
 
 ## Example output
