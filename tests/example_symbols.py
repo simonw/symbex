@@ -87,3 +87,15 @@ class ClassWithMethods:
 
     async def async_method(a, b, c):
         pass
+
+
+# Borrowed from Jedi
+# https://github.com/simonw/symbex/issues/16
+def function_with_non_pep_0484_annotation(
+    x: "I can put anything here",
+    xx: "",
+    yy: "\r\n\0;+*&^564835(---^&*34",
+    y: 3 + 3,
+    zz: float,
+) -> int("42"):
+    pass

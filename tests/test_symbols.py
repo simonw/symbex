@@ -32,6 +32,10 @@ def symbols_text():
         ("ClassSingleBase", "class ClassSingleBase(int)"),
         ("ClassMultipleBase", "class ClassMultipleBase(int, str)"),
         ("ClassWithMeta", "class ClassWithMeta(metaclass=type)"),
+        (
+            "function_with_non_pep_0484_annotation",
+            "function_with_non_pep_0484_annotation(x, xx, yy, y, zz: float) -> ?",
+        ),
     ),
 )
 def test_symbols(name, expected, symbols_text):

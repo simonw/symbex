@@ -147,9 +147,15 @@ def function_definition(function_node: AST):
     if function_node.returns:
         if hasattr(function_node.returns, "id"):
             return_annotation = f" -> {function_node.returns.id}"
-        elif function_node.returns.value is None:
-            # None shows as returns.value is None
-            return_annotation = " -> None"
+        else:
+            try:
+                if function_node.returns.value is None:
+                    # None shows as returns.value is None
+                    return_annotation = " -> None"
+            except AttributeError:
+                # https://github.com/simonw/symbex/issues/16
+                # The return value is something weird like int("42")
+                return_annotation = " -> ?"
 
     def_ = "def "
     if isinstance(function_node, AsyncFunctionDef):
