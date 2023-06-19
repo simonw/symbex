@@ -1,5 +1,5 @@
 import fnmatch
-from ast import literal_eval, parse, AST, FunctionDef, ClassDef
+from ast import literal_eval, parse, AST, AsyncFunctionDef, FunctionDef, ClassDef
 from itertools import zip_longest
 import textwrap
 from typing import Iterable, List, Optional, Tuple
@@ -13,7 +13,7 @@ def find_symbol_nodes(
     matches = []
     module = parse(code)
     for node in module.body:
-        if not isinstance(node, (ClassDef, FunctionDef)):
+        if not isinstance(node, (ClassDef, FunctionDef, AsyncFunctionDef)):
             continue
         name = getattr(node, "name", None)
         if match(name, symbols):
@@ -21,7 +21,7 @@ def find_symbol_nodes(
         # If it's a class search its methods too
         if isinstance(node, ClassDef):
             for child in node.body:
-                if isinstance(child, FunctionDef):
+                if isinstance(child, (FunctionDef, AsyncFunctionDef)):
                     qualified_name = f"{name}.{child.name}"
                     if match(qualified_name, symbols):
                         matches.append((child, name))
@@ -37,7 +37,7 @@ def code_for_node(
     start = None
     end = None
     if signatures:
-        if isinstance(node, FunctionDef):
+        if isinstance(node, (FunctionDef, AsyncFunctionDef)):
             definition, lineno = function_definition(node), node.lineno
             if class_name:
                 definition = "    " + definition

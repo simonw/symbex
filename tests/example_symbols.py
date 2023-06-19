@@ -11,6 +11,11 @@ def func_positional_args(a, b, c):
     pass
 
 
+# Async function
+async def async_func(a, b, c):
+    pass
+
+
 # Function with default arguments
 def func_default_args(a, b=2, c=3):
     pass
@@ -78,4 +83,7 @@ class ClassWithMethods:
         pass
 
     def method_keyword_only_args(a, *, b, c):
+        pass
+
+    async def async_method(a, b, c):
         pass

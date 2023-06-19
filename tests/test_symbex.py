@@ -26,6 +26,19 @@ def directory_full_of_code(tmpdir):
         """
             ),
         ),
+        (
+            "async.py",
+            textwrap.dedent(
+                """
+            async def async_func(a, b, c):
+                pass
+
+            class MyAsyncClass:
+                async def async_method(a, b, c):
+                    pass
+            """
+            ).strip(),
+        ),
     ):
         p = pathlib.Path(tmpdir / path)
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -48,6 +61,10 @@ def directory_full_of_code(tmpdir):
         (
             ["baz", "--silent"],
             "# File: nested/baz.py Line: 1\ndef baz():\n    pass\n\n",
+        ),
+        (
+            ["async_func", "--silent"],
+            "# File: async.py Line: 1\nasync def async_func(a, b, c):\n    pass\n\n",
         ),
         # The -f option
         (
@@ -95,6 +112,15 @@ def directory_full_of_code(tmpdir):
             "    def method1(self, a=1):\n"
             "        pass\n"
             "\n",
+        ),
+        (
+            ["*.async_method", "--silent"],
+            (
+                "# File: async.py Class: MyAsyncClass Line: 5\n"
+                "    async def async_method(a, b, c):\n"
+                "        pass\n"
+                "\n"
+            ),
         ),
     ),
 )
