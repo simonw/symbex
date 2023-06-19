@@ -18,7 +18,13 @@ from .lib import code_for_node, find_symbol_nodes
     multiple=True,
     help="Directories to search",
 )
-def cli(symbols, files, directories):
+@click.option(
+    "-s",
+    "--silent",
+    is_flag=True,
+    help="Silently ignore Python files with parse errors",
+)
+def cli(symbols, files, directories, silent):
     """
     Find symbols in Python code and print the code for them.
 
@@ -46,7 +52,12 @@ def cli(symbols, files, directories):
     pwd = pathlib.Path(".").resolve()
     for file in files:
         code = file.read_text("utf-8") if hasattr(file, "read_text") else file.read()
-        nodes = find_symbol_nodes(code, symbols)
+        try:
+            nodes = find_symbol_nodes(code, symbols)
+        except SyntaxError as ex:
+            if not silent:
+                click.secho(f"# Syntax error in {file}: {ex}", err=True, fg="yellow")
+            continue
         for node in nodes:
             # If file is within pwd, print relative path
             # else print absolute path

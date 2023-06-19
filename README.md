@@ -39,6 +39,14 @@ To search within a specific directory and all of its subdirectories, use the `-d
 ```bash
 symbex Database -d ~/projects/datasette
 ```
+If `symbex` encounters any Python code that it cannot parse, it will print a warning message and continue searching:
+```
+# Syntax error in path/badcode.py: expected ':' (<unknown>, line 1)
+```
+Pass `-s/--silent` to suppress these warnings:
+```bash
+symbex MyClass -s
+```
 
 ## Example output
 
