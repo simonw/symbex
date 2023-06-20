@@ -114,28 +114,31 @@ cog.out(
 )
 ]]] -->
 ```
-# File: symbex/cli.py Line: 37
-def cli(symbols, files, directories, signatures, silent)
+# File: symbex/cli.py Line: 75
+def cli(symbols, files, directories, signatures, silent, async_, function, class_, typed, untyped, partially_typed, fully_typed)
 
-# File: symbex/lib.py Line: 10
+# File: symbex/lib.py Line: 11
 def find_symbol_nodes(code: str, filename: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]
 
-# File: symbex/lib.py Line: 158
+# File: symbex/lib.py Line: 159
 def class_definition(class_def)
 
-# File: symbex/lib.py Line: 192
+# File: symbex/lib.py Line: 193
 def annotation_definition(annotation: AST) -> str
 
-# File: symbex/lib.py Line: 210
+# File: symbex/lib.py Line: 211
 def read_file(path)
 
-# File: symbex/lib.py Line: 34
+# File: symbex/lib.py Line: 241
+def annotation_summary(node: AST) -> AnnotationSummary
+
+# File: symbex/lib.py Line: 35
 def code_for_node(code: str, node: AST, class_name: str, signatures: bool) -> Tuple[(str, int)]
 
-# File: symbex/lib.py Line: 65
+# File: symbex/lib.py Line: 66
 def match(name: str, symbols: Iterable[str]) -> bool
 
-# File: symbex/lib.py Line: 90
+# File: symbex/lib.py Line: 91
 def function_definition(function_node: AST)
 ```
 <!-- [[[end]]] -->
