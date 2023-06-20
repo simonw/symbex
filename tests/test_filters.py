@@ -114,6 +114,7 @@ from symbex.cli import cli
             ["--typed", "*.*"],
             [
                 "def method_types",
+                "def __init__",
                 "def method_fully_typed",
                 "def method_partially_typed",
             ],
@@ -128,7 +129,10 @@ from symbex.cli import cli
                 "def method_untyped",
             ],
         ),
-        (["--fully-typed", "*.*"], ["def method_types", "def method_fully_typed"]),
+        (
+            ["--fully-typed", "*.*"],
+            ["def method_types", "def __init__", "def method_fully_typed"],
+        ),
         (
             ["--partially-typed", "*.*"],
             ["def method_partially_typed"],

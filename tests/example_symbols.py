@@ -135,6 +135,9 @@ def func_typed_no_params() -> None:
 
 
 class ClassForTypedTests:
+    def __init__(self, a: int):
+        pass
+
     def method_fully_typed(self, a: int, b: str) -> bool:
         pass
 

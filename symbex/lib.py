@@ -271,6 +271,13 @@ def type_summary(node: AST) -> Optional[TypeSummary]:
     # or all arguments except for the untyped self are typed
     if has_untyped_self and len(typed_args) == num_arguments - 1 and return_is_typed:
         fully = True
+    # Another special case: __init__() doesn't need a return type
+    if node.name == "__init__":
+        if (has_untyped_self and len(typed_args) == num_arguments - 1) or len(
+            typed_args
+        ) == num_arguments:
+            # Doesn't matter if we have a return type
+            fully = True
 
     return TypeSummary(
         fully=fully,
