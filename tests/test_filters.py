@@ -141,14 +141,14 @@ from symbex.cli import cli
 )
 def test_filters(args, expected):
     runner = CliRunner()
+    full_args = args + [
+        "-s",
+        "-f",
+        str(pathlib.Path(__file__).parent / "example_symbols.py"),
+    ]
     result = runner.invoke(
         cli,
-        args
-        + [
-            "-s",
-            "-f",
-            str(pathlib.Path(__file__).parent / "example_symbols.py"),
-        ],
+        full_args,
         catch_exceptions=False,
     )
     assert result.exit_code == 0
@@ -161,3 +161,13 @@ def test_filters(args, expected):
     # We only match up to the opening "("
     defs = [line.split("(")[0] for line in lines]
     assert defs == expected
+
+    # Test the --count option too
+    expected_count = len(expected)
+    result2 = runner.invoke(
+        cli,
+        full_args + ["--count"],
+        catch_exceptions=False,
+    )
+    assert result2.exit_code == 0
+    assert result2.stdout.strip() == str(expected_count)

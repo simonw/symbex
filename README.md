@@ -142,8 +142,8 @@ cog.out(
 )
 ]]] -->
 ```
-# File: symbex/cli.py Line: 75
-def cli(symbols, files, directories, signatures, silent, async_, function, class_, typed, untyped, partially_typed, fully_typed)
+# File: symbex/cli.py Line: 80
+def cli(symbols, files, directories, signatures, count, silent, async_, function, class_, typed, untyped, partially_typed, fully_typed)
 
 # File: symbex/lib.py Line: 11
 def find_symbol_nodes(code: str, filename: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]
@@ -174,6 +174,18 @@ def function_definition(function_node: AST)
 ```
 <!-- [[[end]]] -->
 This can be combined with other options, or you can run `symbex -s` to see every symbol in the current directory and its subdirectories.
+
+## Counting symbols
+
+If you just want to count the number of functions and classes that match your filters, use the `--count` option. Here's how to count your classes:
+
+```bash
+symbex --class --count
+```
+Or to count every async test function:
+```bash
+symbex --async 'test_*' --count
+```
 
 ## Using with LLM
 
@@ -239,11 +251,15 @@ Usage: symbex [OPTIONS] [SYMBOLS]...
       # View signatures for all async functions with type definitions
       symbex --async --typed -s
 
+      # Count the number of --async functions in the project
+      symbex --async --count
+
 Options:
   --version                  Show the version and exit.
   -f, --file FILE            Files to search
   -d, --directory DIRECTORY  Directories to search
   -s, --signatures           Show just function and class signatures
+  --count                    Show count of matching symbols
   --silent                   Silently ignore Python files with parse errors
   --async                    Filter async functions
   --function                 Filter functions

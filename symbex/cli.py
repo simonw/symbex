@@ -31,6 +31,11 @@ from .lib import code_for_node, find_symbol_nodes, read_file, type_summary
     help="Show just function and class signatures",
 )
 @click.option(
+    "--count",
+    is_flag=True,
+    help="Show count of matching symbols",
+)
+@click.option(
     "--silent",
     is_flag=True,
     help="Silently ignore Python files with parse errors",
@@ -77,6 +82,7 @@ def cli(
     files,
     directories,
     signatures,
+    count,
     silent,
     async_,
     function,
@@ -126,7 +132,13 @@ def cli(
     \b
         # View signatures for all async functions with type definitions
         symbex --async --typed -s
+
+    \b
+        # Count the number of --async functions in the project
+        symbex --async --count
     """
+    if count:
+        signatures = True
     # Show --help if no filter options are provided:
     if not any(
         [
@@ -205,6 +217,7 @@ def cli(
             return True
 
     pwd = pathlib.Path(".").resolve()
+    num_matches = 0
     for file in iterate_files():
         code = read_file(file)
         try:
@@ -215,6 +228,9 @@ def cli(
             continue
         for node, class_name in nodes:
             if not filter(node):
+                continue
+            if count:
+                num_matches += 1
                 continue
             # If file is within pwd, print relative path
             if pwd in file.resolve().parents:
@@ -230,3 +246,5 @@ def cli(
             print(*bits)
             print(snippet)
             print()
+    if count:
+        click.echo(num_matches)
