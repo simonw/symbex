@@ -61,6 +61,34 @@ Pass `--silent` to suppress these warnings:
 ```bash
 symbex MyClass --silent
 ```
+### Filters
+
+In addition to searching for symbols, you can apply filters to the results.
+
+The following filters are available:
+
+- `--function` - only functions
+- `--class` - only classes
+- `--async` - only `async def` functions
+- `--typed` - functions that have at least one type annotation
+- `--untyped` - functions that have no type annotations
+- `--partially-typed` - functions that have some type annotations but not all
+- `--fully-typed` - functions that have type annotations for every argument and the return value
+
+For example, to see the signatures of every `async def` function in your project that doesn't have any type annotations:
+
+```bash
+symbex -s --async --untyped
+```
+
+For class methods instead of functions, you can combine filters with a symbol search argument of `*.*`.
+
+This example shows the full source code of every class method in your project with type annotations on all of the arguments and the return value:
+
+```bash
+symbex --fully-typed '*.*'
+```
+
 ### Example output
 
 In a fresh checkout of [Datasette](https://github.com/simonw/datasette) I ran this command:
