@@ -214,7 +214,7 @@ Usage: symbex [OPTIONS] [SYMBOLS]...
 
       # Search current directory and subdirectories
       symbex my_function MyClass
-  
+
       # Search using a wildcard
       symbex 'test_*'
 
@@ -226,7 +226,7 @@ Usage: symbex [OPTIONS] [SYMBOLS]...
 
       # Search a specific file
       symbex MyClass -f my_file.py
-  
+
       # Search within a specific directory and its subdirectories
       symbex Database -d ~/projects/datasette
 
@@ -235,6 +235,9 @@ Usage: symbex [OPTIONS] [SYMBOLS]...
 
       # View signatures for all test functions
       symbex 'test_*' -s
+
+      # View signatures for all async functions with type definitions
+      symbex --async --typed -s
 
 Options:
   --version                  Show the version and exit.

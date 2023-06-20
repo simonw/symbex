@@ -94,6 +94,7 @@ def cli(
     \b
         # Search current directory and subdirectories
         symbex my_function MyClass
+
     \b
         # Search using a wildcard
         symbex 'test_*'
@@ -109,6 +110,7 @@ def cli(
     \b
         # Search a specific file
         symbex MyClass -f my_file.py
+
     \b
         # Search within a specific directory and its subdirectories
         symbex Database -d ~/projects/datasette
@@ -120,6 +122,10 @@ def cli(
     \b
         # View signatures for all test functions
         symbex 'test_*' -s
+
+    \b
+        # View signatures for all async functions with type definitions
+        symbex --async --typed -s
     """
     # Show --help if no filter options are provided:
     if not any(
