@@ -61,6 +61,34 @@ Pass `--silent` to suppress these warnings:
 ```bash
 symbex MyClass --silent
 ```
+### Filters
+
+In addition to searching for symbols, you can apply filters to the results.
+
+The following filters are available:
+
+- `--function` - only functions
+- `--class` - only classes
+- `--async` - only `async def` functions
+- `--typed` - functions that have at least one type annotation
+- `--untyped` - functions that have no type annotations
+- `--partially-typed` - functions that have some type annotations but not all
+- `--fully-typed` - functions that have type annotations for every argument and the return value
+
+For example, to see the signatures of every `async def` function in your project that doesn't have any type annotations:
+
+```bash
+symbex -s --async --untyped
+```
+
+For class methods instead of functions, you can combine filters with a symbol search argument of `*.*`.
+
+This example shows the full source code of every class method in your project with type annotations on all of the arguments and the return value:
+
+```bash
+symbex --fully-typed '*.*'
+```
+
 ### Example output
 
 In a fresh checkout of [Datasette](https://github.com/simonw/datasette) I ran this command:
@@ -114,28 +142,34 @@ cog.out(
 )
 ]]] -->
 ```
-# File: symbex/cli.py Line: 37
-def cli(symbols, files, directories, signatures, silent)
+# File: symbex/cli.py Line: 75
+def cli(symbols, files, directories, signatures, silent, async_, function, class_, typed, untyped, partially_typed, fully_typed)
 
-# File: symbex/lib.py Line: 10
+# File: symbex/lib.py Line: 11
 def find_symbol_nodes(code: str, filename: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]
 
-# File: symbex/lib.py Line: 158
+# File: symbex/lib.py Line: 159
 def class_definition(class_def)
 
-# File: symbex/lib.py Line: 192
+# File: symbex/lib.py Line: 193
 def annotation_definition(annotation: AST) -> str
 
-# File: symbex/lib.py Line: 210
+# File: symbex/lib.py Line: 211
 def read_file(path)
 
-# File: symbex/lib.py Line: 34
+# File: symbex/lib.py Line: 237
+class TypeSummary
+
+# File: symbex/lib.py Line: 242
+def type_summary(node: AST) -> Optional[TypeSummary]
+
+# File: symbex/lib.py Line: 35
 def code_for_node(code: str, node: AST, class_name: str, signatures: bool) -> Tuple[(str, int)]
 
-# File: symbex/lib.py Line: 65
+# File: symbex/lib.py Line: 66
 def match(name: str, symbols: Iterable[str]) -> bool
 
-# File: symbex/lib.py Line: 90
+# File: symbex/lib.py Line: 91
 def function_definition(function_node: AST)
 ```
 <!-- [[[end]]] -->

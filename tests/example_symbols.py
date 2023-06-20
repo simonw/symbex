@@ -105,3 +105,44 @@ def complex_annotations(
     code: str, symbols: Iterable[str]
 ) -> List[Tuple[AST, Optional[str]]]:
     pass
+
+
+# For testing --typed/--untyped/etc
+
+
+def func_fully_typed(a: int, b: str) -> bool:
+    pass
+
+
+async def async_func_fully_typed(a: int, b: str) -> bool:
+    pass
+
+
+def func_partially_typed(a: int, b) -> bool:
+    pass
+
+
+def func_partially_typed_no_typed_return(a: int, b: int):
+    pass
+
+
+def func_partially_typed_only_typed_return(a, b) -> int:
+    pass
+
+
+def func_typed_no_params() -> None:
+    pass
+
+
+class ClassForTypedTests:
+    def __init__(self, a: int):
+        pass
+
+    def method_fully_typed(self, a: int, b: str) -> bool:
+        pass
+
+    def method_partially_typed(self, a: int, b) -> bool:
+        pass
+
+    def method_untyped(self, a, b):
+        pass

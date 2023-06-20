@@ -2,6 +2,7 @@ import fnmatch
 import ast
 from ast import literal_eval, parse, AST, AsyncFunctionDef, FunctionDef, ClassDef
 import codecs
+from dataclasses import dataclass
 from itertools import zip_longest
 import re
 from typing import Iterable, List, Optional, Tuple
@@ -230,3 +231,55 @@ def read_file(path):
             content = f.read()
 
     return content
+
+
+@dataclass
+class TypeSummary:
+    fully: bool
+    partially: bool
+
+
+def type_summary(node: AST) -> Optional[TypeSummary]:
+    if not isinstance(node, (FunctionDef, AsyncFunctionDef)):
+        return None
+    all_args = [
+        *node.args.posonlyargs,
+        *node.args.args,
+        *node.args.kwonlyargs,
+    ]
+    num_arguments = len(all_args)
+    has_untyped_self = False
+    typed_args = []
+    first = True
+    for arg in all_args:
+        # Special case if the first argument is self - note that we do not
+        # check that we are a class method but ideally we would do that
+        if first and arg.arg == "self":
+            has_untyped_self = True
+            continue
+        if arg.annotation:
+            typed_args.append(arg)
+        first = False
+
+    return_is_typed = bool(node.returns)
+
+    partially = len(typed_args) > 0 or return_is_typed
+    fully = False
+    if len(typed_args) == num_arguments and return_is_typed:
+        fully = True
+    # Something is fully typed if either EVERY arg is typed
+    # or all arguments except for the untyped self are typed
+    if has_untyped_self and len(typed_args) == num_arguments - 1 and return_is_typed:
+        fully = True
+    # Another special case: __init__() doesn't need a return type
+    if node.name == "__init__":
+        if (has_untyped_self and len(typed_args) == num_arguments - 1) or len(
+            typed_args
+        ) == num_arguments:
+            # Doesn't matter if we have a return type
+            fully = True
+
+    return TypeSummary(
+        fully=fully,
+        partially=partially,
+    )

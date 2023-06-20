@@ -1,7 +1,8 @@
+import ast
 import click
 import pathlib
 
-from .lib import code_for_node, find_symbol_nodes, read_file
+from .lib import code_for_node, find_symbol_nodes, read_file, type_summary
 
 
 @click.command()
@@ -34,7 +35,57 @@ from .lib import code_for_node, find_symbol_nodes, read_file
     is_flag=True,
     help="Silently ignore Python files with parse errors",
 )
-def cli(symbols, files, directories, signatures, silent):
+@click.option(
+    "async_",
+    "--async",
+    is_flag=True,
+    help="Filter async functions",
+)
+@click.option(
+    "--function",
+    is_flag=True,
+    help="Filter functions",
+)
+@click.option(
+    "class_",
+    "--class",
+    is_flag=True,
+    help="Filter classes",
+)
+@click.option(
+    "--typed",
+    is_flag=True,
+    help="Filter functions with type annotations",
+)
+@click.option(
+    "--untyped",
+    is_flag=True,
+    help="Filter functions without type annotations",
+)
+@click.option(
+    "--partially-typed",
+    is_flag=True,
+    help="Filter functions with partial type annotations",
+)
+@click.option(
+    "--fully-typed",
+    is_flag=True,
+    help="Filter functions with full type annotations",
+)
+def cli(
+    symbols,
+    files,
+    directories,
+    signatures,
+    silent,
+    async_,
+    function,
+    class_,
+    typed,
+    untyped,
+    partially_typed,
+    fully_typed,
+):
     """
     Find symbols in Python code and print the code for them.
 
@@ -70,11 +121,39 @@ def cli(symbols, files, directories, signatures, silent):
         # View signatures for all test functions
         symbex 'test_*' -s
     """
-    if not symbols and not signatures:
+    # Show --help if no filter options are provided:
+    if not any(
+        [
+            symbols,
+            signatures,
+            async_,
+            function,
+            class_,
+            typed,
+            untyped,
+            partially_typed,
+            fully_typed,
+        ]
+    ):
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
         ctx.exit()
-    if signatures and not symbols:
+    # Default to '*' if --signatures or filters are provided without symbols
+    if (
+        any(
+            [
+                signatures,
+                async_,
+                function,
+                class_,
+                typed,
+                untyped,
+                partially_typed,
+                fully_typed,
+            ]
+        )
+        and not symbols
+    ):
         symbols = ["*"]
     if not files and not directories:
         directories = ["."]
@@ -86,6 +165,39 @@ def cli(symbols, files, directories, signatures, silent):
                 if path.is_file():
                     yield path
 
+    # Filter symbols by type
+    def filter(node: ast.AST) -> bool:
+        return True
+
+    # If any --filters were supplied, handle them:
+    if any([async_, function, class_, typed, untyped, partially_typed, fully_typed]):
+
+        def filter(node: ast.AST) -> bool:
+            # Filters must ALL match
+            if async_ and not isinstance(node, ast.AsyncFunctionDef):
+                return False
+            if function and not isinstance(
+                node, (ast.FunctionDef, ast.AsyncFunctionDef)
+            ):
+                return False
+            if class_ and not isinstance(node, ast.ClassDef):
+                return False
+            summary = type_summary(node)
+            # if no summary, type filters all fail
+            if not summary and (typed or untyped or partially_typed or fully_typed):
+                return False
+            # Apply type filters
+            if typed and not summary.partially:
+                return False
+            if untyped and summary.partially:
+                return False
+            if partially_typed and not (summary.partially and not summary.fully):
+                return False
+            if fully_typed and not summary.fully:
+                return False
+
+            return True
+
     pwd = pathlib.Path(".").resolve()
     for file in iterate_files():
         code = read_file(file)
@@ -96,11 +208,13 @@ def cli(symbols, files, directories, signatures, silent):
                 click.secho(f"# Syntax error in {file}: {ex}", err=True, fg="yellow")
             continue
         for node, class_name in nodes:
+            if not filter(node):
+                continue
             # If file is within pwd, print relative path
-            # else print absolute path
             if pwd in file.resolve().parents:
                 path = file.resolve().relative_to(pwd)
             else:
+                # else print absolute path
                 path = file.resolve()
             snippet, line_no = code_for_node(code, node, class_name, signatures)
             bits = ["# File:", path]
