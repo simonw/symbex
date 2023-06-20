@@ -129,8 +129,11 @@ def annotation_definition(annotation: AST) -> str
 # File: symbex/lib.py Line: 211
 def read_file(path)
 
-# File: symbex/lib.py Line: 241
-def annotation_summary(node: AST) -> AnnotationSummary
+# File: symbex/lib.py Line: 237
+class TypeSummary
+
+# File: symbex/lib.py Line: 242
+def type_summary(node: AST) -> Optional[TypeSummary]
 
 # File: symbex/lib.py Line: 35
 def code_for_node(code: str, node: AST, class_name: str, signatures: bool) -> Tuple[(str, int)]
