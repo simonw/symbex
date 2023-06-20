@@ -171,45 +171,48 @@ def cli(
     ):
 
         def filter(node: ast.AST) -> bool:
-            # node can match any of the specified types
-            if async_ and isinstance(node, ast.AsyncFunctionDef):
-                return True
-            if function and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                return True
-            if class_ and isinstance(node, ast.ClassDef):
-                return True
+            # Filters must ALL match
+            if async_ and not isinstance(node, ast.AsyncFunctionDef):
+                return False
+            if function and not isinstance(
+                node, (ast.FunctionDef, ast.AsyncFunctionDef)
+            ):
+                return False
+            if class_ and not isinstance(node, ast.ClassDef):
+                return False
             summary = annotation_summary(node)
             # TODO: Refactor this, also handle return types
-            if (
-                typed
-                and summary
+            if typed and not (
+                summary
                 and (
                     (summary.num_arguments and summary.num_typed)
                     or summary.return_is_typed
                 )
             ):
-                return True
-            if (
-                untyped
-                and summary
+                return False
+            if untyped and not (
+                summary
                 and summary.num_typed < summary.num_arguments
                 and not summary.return_is_typed
             ):
-                return True
-            if (
-                partially_typed
-                and summary
+                return False
+            if partially_typed and not (
+                summary
                 and summary.num_typed
                 and (
                     (summary.num_typed < summary.num_arguments)
                     or not summary.return_is_typed
                 )
             ):
-                return True
-            if fully_typed and summary and summary.num_typed == summary.num_arguments:
-                return True
+                return False
+            if fully_typed and not (
+                summary
+                and summary.num_typed == summary.num_arguments
+                and summary.return_is_typed
+            ):
+                return False
 
-            return False
+            return True
 
     pwd = pathlib.Path(".").resolve()
     for file in iterate_files():

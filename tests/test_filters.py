@@ -50,19 +50,10 @@ from symbex.cli import cli
                 "async def async_func_fully_typed",
             ],
         ),
-        # Using multiple at the same time returns symbols matching any of them
+        # This doesn't make sense, so should return []
         (
             ["--async", "--class"],
-            [
-                "async def async_func",
-                "class ClassNoBase",
-                "class ClassSingleBase",
-                "class ClassMultipleBase",
-                "class ClassWithMeta",
-                "class ClassWithMethods",
-                "async def async_func_fully_typed",
-                "class ClassForTypedTests",
-            ],
+            [],
         ),
         # Various typing options
         (
@@ -76,6 +67,40 @@ from symbex.cli import cli
                 "def func_partially_typed",
                 "def func_partially_typed_no_typed_return",
                 "def func_partially_typed_only_typed_return",
+                "def func_typed_no_params",
+            ],
+        ),
+        (
+            ["--typed", "--async"],
+            [
+                "async def async_func_fully_typed",
+            ],
+        ),
+        (
+            ["--untyped"],
+            [
+                "def func_positional_args",
+                "async def async_func",
+                "def func_default_args",
+                "def func_positional_only_args",
+                "def func_keyword_only_args",
+            ],
+        ),
+        (
+            ["--partially-typed"],
+            [
+                "def func_partially_typed",
+                "def func_partially_typed_no_typed_return",
+            ],
+        ),
+        (
+            ["--fully-typed"],
+            [
+                "def func_type_annotations",
+                "def function_with_non_pep_0484_annotation",
+                "def complex_annotations",
+                "def func_fully_typed",
+                "async def async_func_fully_typed",
                 "def func_typed_no_params",
             ],
         ),
