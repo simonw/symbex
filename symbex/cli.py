@@ -2,7 +2,7 @@ import ast
 import click
 import pathlib
 
-from .lib import annotation_summary, code_for_node, find_symbol_nodes, read_file
+from .lib import code_for_node, find_symbol_nodes, read_file, type_summary
 
 
 @click.command()
@@ -121,30 +121,39 @@ def cli(
         # View signatures for all test functions
         symbex 'test_*' -s
     """
-    if (
-        not symbols
-        and not signatures
-        and not async_
-        and not function
-        and not class_
-        and not typed
-        and not untyped
-        and not partially_typed
-        and not fully_typed
+    # Show --help if no filter options are provided:
+    if not any(
+        [
+            symbols,
+            signatures,
+            async_,
+            function,
+            class_,
+            typed,
+            untyped,
+            partially_typed,
+            fully_typed,
+        ]
     ):
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
         ctx.exit()
+    # Default to '*' if --signatures or filters are provided without symbols
     if (
-        signatures
-        or async_
-        or function
-        or class_
-        or typed
-        or untyped
-        or partially_typed
-        or fully_typed
-    ) and not symbols:
+        any(
+            [
+                signatures,
+                async_,
+                function,
+                class_,
+                typed,
+                untyped,
+                partially_typed,
+                fully_typed,
+            ]
+        )
+        and not symbols
+    ):
         symbols = ["*"]
     if not files and not directories:
         directories = ["."]
@@ -160,15 +169,8 @@ def cli(
     def filter(node: ast.AST) -> bool:
         return True
 
-    if (
-        async_
-        or function
-        or class_
-        or typed
-        or untyped
-        or partially_typed
-        or fully_typed
-    ):
+    # If any --filters were supplied, handle them:
+    if any([async_, function, class_, typed, untyped, partially_typed, fully_typed]):
 
         def filter(node: ast.AST) -> bool:
             # Filters must ALL match
@@ -180,36 +182,18 @@ def cli(
                 return False
             if class_ and not isinstance(node, ast.ClassDef):
                 return False
-            summary = annotation_summary(node)
-            # TODO: Refactor this, also handle return types
-            if typed and not (
-                summary
-                and (
-                    (summary.num_arguments and summary.num_typed)
-                    or summary.return_is_typed
-                )
-            ):
+            summary = type_summary(node)
+            # if no summary, type filters all fail
+            if not summary and (typed or untyped or partially_typed or fully_typed):
                 return False
-            if untyped and not (
-                summary
-                and summary.num_typed < summary.num_arguments
-                and not summary.return_is_typed
-            ):
+            # Apply type filters
+            if typed and not summary.partially:
                 return False
-            if partially_typed and not (
-                summary
-                and summary.num_typed
-                and (
-                    (summary.num_typed < summary.num_arguments)
-                    or not summary.return_is_typed
-                )
-            ):
+            if untyped and summary.partially:
                 return False
-            if fully_typed and not (
-                summary
-                and summary.num_typed == summary.num_arguments
-                and summary.return_is_typed
-            ):
+            if partially_typed and not (summary.partially and not summary.fully):
+                return False
+            if fully_typed and not summary.fully:
                 return False
 
             return True

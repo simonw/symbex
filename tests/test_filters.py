@@ -79,9 +79,13 @@ from symbex.cli import cli
         (
             ["--untyped"],
             [
+                "def func_no_args",
                 "def func_positional_args",
                 "async def async_func",
                 "def func_default_args",
+                "def func_arbitrary_positional_args",
+                "def func_arbitrary_keyword_args",
+                "def func_arbitrary_args",
                 "def func_positional_only_args",
                 "def func_keyword_only_args",
             ],
@@ -91,6 +95,7 @@ from symbex.cli import cli
             [
                 "def func_partially_typed",
                 "def func_partially_typed_no_typed_return",
+                "def func_partially_typed_only_typed_return",
             ],
         ),
         (
@@ -103,6 +108,30 @@ from symbex.cli import cli
                 "async def async_func_fully_typed",
                 "def func_typed_no_params",
             ],
+        ),
+        # Test against methods
+        (
+            ["--typed", "*.*"],
+            [
+                "def method_types",
+                "def method_fully_typed",
+                "def method_partially_typed",
+            ],
+        ),
+        (
+            ["--untyped", "*.*"],
+            [
+                "def __init__",
+                "def method_positional_only_args",
+                "def method_keyword_only_args",
+                "async def async_method",
+                "def method_untyped",
+            ],
+        ),
+        (["--fully-typed", "*.*"], ["def method_types", "def method_fully_typed"]),
+        (
+            ["--partially-typed", "*.*"],
+            ["def method_partially_typed"],
         ),
     ),
 )
