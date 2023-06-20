@@ -2,6 +2,7 @@ import fnmatch
 import ast
 from ast import literal_eval, parse, AST, AsyncFunctionDef, FunctionDef, ClassDef
 import codecs
+from collections import namedtuple
 from itertools import zip_longest
 import re
 from typing import Iterable, List, Optional, Tuple
@@ -230,3 +231,22 @@ def read_file(path):
             content = f.read()
 
     return content
+
+
+AnnotationSummary = namedtuple(
+    "Summary", ["num_arguments", "num_typed", "return_is_typed"]
+)
+
+
+def annotation_summary(node: AST) -> AnnotationSummary:
+    if not isinstance(node, (FunctionDef, AsyncFunctionDef)):
+        return None
+    all_args = [
+        *node.args.posonlyargs,
+        *node.args.args,
+        *node.args.kwonlyargs,
+    ]
+    num_arguments = len(all_args)
+    num_typed = len([arg for arg in all_args if arg.annotation])
+    return_is_typed = bool(node.returns)
+    return AnnotationSummary(num_arguments, num_typed, return_is_typed)
