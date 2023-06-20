@@ -12,7 +12,7 @@
 
 # Rebuild docs with cog
 @cog:
-  pipenv run cog -r docs/*.md
+  pipenv run cog -r README.md
 
 # Apply Black
 @black:
