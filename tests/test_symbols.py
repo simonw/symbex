@@ -1,6 +1,7 @@
 # Tests for "symbex -s", using content of example_code.py
 import pathlib
 import pytest
+import re
 from click.testing import CliRunner
 
 from symbex.cli import cli
@@ -67,7 +68,44 @@ def test_method_symbols():
     result = runner.invoke(cli, args, catch_exceptions=False)
     assert result.exit_code == 0
     assert result.stdout == (
-        "# File: tests/example_symbols.py Class: ClassWithMethods Line: 88\n"
+        "# File: tests/example_symbols.py Class: ClassWithMethods Line: 91\n"
         "    async def async_method(a, b, c)\n"
         "\n"
     )
+
+
+def test_docstrings():
+    runner = CliRunner()
+    args = [
+        "*.*",
+        "*",
+        "--documented",
+        "--docstrings",
+        "-f",
+        str(pathlib.Path(__file__).parent / "example_symbols.py"),
+    ]
+    result = runner.invoke(cli, args, catch_exceptions=False)
+    assert result.exit_code == 0
+    expected = """
+# File: tests/example_symbols.py Line: X
+def func_no_args()
+    "This has a single line docstring"
+
+# File: tests/example_symbols.py Line: X
+def func_positional_args(a, b, c)
+    \"\"\"This has a
+    multi-line docstring\"\"\"
+
+# File: tests/example_symbols.py Class: ClassForTypedTests Line: X
+    def method_fully_typed(self, a: int, b: str) -> bool
+        "Single line"
+
+# File: tests/example_symbols.py Class: ClassForTypedTests Line: X
+    def method_partially_typed(self, a: int, b) -> bool
+        \"\"\"Multiple
+        lines\"\"\"
+    """.strip()
+    actual = result.stdout.strip()
+    # Replace 'Line \d' with 'Line X' before comparison using re
+    actual = re.sub(r"Line: \d+", "Line: X", actual)
+    assert actual == expected

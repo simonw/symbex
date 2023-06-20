@@ -137,6 +137,38 @@ from symbex.cli import cli
             ["--partially-typed", "*.*"],
             ["def method_partially_typed"],
         ),
+        # Documented and undocumented
+        (
+            ["--documented"],
+            [
+                "def func_no_args",
+                "def func_positional_args",
+            ],
+        ),
+        (
+            ["--undocumented", "func_arbitrary_*"],
+            [
+                "def func_arbitrary_positional_args",
+                "def func_arbitrary_keyword_args",
+                "def func_arbitrary_args",
+            ],
+        ),
+        (
+            ["--documented", "*.*"],
+            [
+                "def method_fully_typed",
+                "def method_partially_typed",
+            ],
+        ),
+        (
+            ["--undocumented", "*.method_*"],
+            [
+                "def method_types",
+                "def method_positional_only_args",
+                "def method_keyword_only_args",
+                "def method_untyped",
+            ],
+        ),
     ),
 )
 def test_filters(args, expected):

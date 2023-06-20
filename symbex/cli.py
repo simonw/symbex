@@ -31,6 +31,11 @@ from .lib import code_for_node, find_symbol_nodes, read_file, type_summary
     help="Show just function and class signatures",
 )
 @click.option(
+    "--docstrings",
+    is_flag=True,
+    help="Show function and class signatures plus docstrings",
+)
+@click.option(
     "--count",
     is_flag=True,
     help="Show count of matching symbols",
@@ -58,6 +63,16 @@ from .lib import code_for_node, find_symbol_nodes, read_file, type_summary
     help="Filter classes",
 )
 @click.option(
+    "--documented",
+    is_flag=True,
+    help="Filter functions with docstrings",
+)
+@click.option(
+    "--undocumented",
+    is_flag=True,
+    help="Filter functions without docstrings",
+)
+@click.option(
     "--typed",
     is_flag=True,
     help="Filter functions with type annotations",
@@ -82,11 +97,14 @@ def cli(
     files,
     directories,
     signatures,
+    docstrings,
     count,
     silent,
     async_,
     function,
     class_,
+    documented,
+    undocumented,
     typed,
     untyped,
     partially_typed,
@@ -137,7 +155,7 @@ def cli(
         # Count the number of --async functions in the project
         symbex --async --count
     """
-    if count:
+    if count or docstrings:
         signatures = True
     # Show --help if no filter options are provided:
     if not any(
@@ -147,6 +165,8 @@ def cli(
             async_,
             function,
             class_,
+            documented,
+            undocumented,
             typed,
             untyped,
             partially_typed,
@@ -164,6 +184,8 @@ def cli(
                 async_,
                 function,
                 class_,
+                documented,
+                undocumented,
                 typed,
                 untyped,
                 partially_typed,
@@ -188,7 +210,19 @@ def cli(
         return True
 
     # If any --filters were supplied, handle them:
-    if any([async_, function, class_, typed, untyped, partially_typed, fully_typed]):
+    if any(
+        [
+            async_,
+            function,
+            class_,
+            documented,
+            undocumented,
+            typed,
+            untyped,
+            partially_typed,
+            fully_typed,
+        ]
+    ):
 
         def filter(node: ast.AST) -> bool:
             # Filters must ALL match
@@ -199,6 +233,10 @@ def cli(
             ):
                 return False
             if class_ and not isinstance(node, ast.ClassDef):
+                return False
+            if documented and not ast.get_docstring(node):
+                return False
+            if undocumented and ast.get_docstring(node):
                 return False
             summary = type_summary(node)
             # if no summary, type filters all fail
@@ -238,7 +276,9 @@ def cli(
             else:
                 # else print absolute path
                 path = file.resolve()
-            snippet, line_no = code_for_node(code, node, class_name, signatures)
+            snippet, line_no = code_for_node(
+                code, node, class_name, signatures, docstrings
+            )
             bits = ["# File:", path]
             if class_name:
                 bits.extend(["Class:", class_name])

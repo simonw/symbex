@@ -4,7 +4,7 @@ import textwrap
 from click.testing import CliRunner
 
 from symbex.cli import cli
-from symbex.lib import read_file
+from symbex.lib import read_file, quoted_string
 
 
 def test_no_args_shows_help():
@@ -198,3 +198,29 @@ def test_read_file_with_encoding(tmpdir):
         "# БЖџрстуфхцчшщъыьэюя <- Cyrillic characters\n"
         'u = "Ўт№Ф"\n'
     )
+
+
+def test_quoted_string():
+    # Single line, no quotes
+    assert quoted_string("Hello, World!") == '"Hello, World!"'
+
+    # Single line, with quotes
+    assert quoted_string('Hello, "World"!') == '"Hello, \\"World\\"!"'
+
+    # Multiline, no quotes
+    multiline_str = "Hello,\nWorld!"
+    expected_result = '"""Hello,\nWorld!"""'
+    assert quoted_string(multiline_str) == expected_result
+
+    # Multiline, with triple quotes
+    multiline_str = '''Hello,
+"World",
+Here are some triple quotes: """ '''
+    expected_multiline_result = (
+        '"""Hello,\n"World",\nHere are some triple quotes: \\"\\"\\" """'
+    )
+    quoted_multiline_result = quoted_string(multiline_str)
+    assert quoted_multiline_result == expected_multiline_result
+
+    # Empty string
+    assert quoted_string("") == '""'

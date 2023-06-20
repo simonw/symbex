@@ -72,6 +72,8 @@ The following filters are available:
 - `--function` - only functions
 - `--class` - only classes
 - `--async` - only `async def` functions
+- `--documented` - functions/classes that have a docstring
+- `--undocumented` - functions/classes that do not have a docstring
 - `--typed` - functions that have at least one type annotation
 - `--untyped` - functions that have no type annotations
 - `--partially-typed` - functions that have some type annotations but not all
@@ -126,7 +128,6 @@ The `-s/--signatures` option will list just the signatures of the functions and 
 ```bash
 symbex -s -d symbex
 ```
-
 <!-- [[[cog
 import cog
 from click.testing import CliRunner
@@ -140,42 +141,78 @@ result = runner.invoke(cli, ["-s", "-d", str(path)])
 chunks = result.stdout.strip().split("\n\n")
 chunks.sort()
 cog.out(
-    "```\n{}\n```\n".format("\n\n".join(chunks))
+    "```python\n{}\n```\n".format("\n\n".join(chunks))
 )
 ]]] -->
-```
-# File: symbex/cli.py Line: 80
-def cli(symbols, files, directories, signatures, count, silent, async_, function, class_, typed, untyped, partially_typed, fully_typed)
+```python
+# File: symbex/cli.py Line: 95
+def cli(symbols, files, directories, signatures, docstrings, count, silent, async_, function, class_, documented, undocumented, typed, untyped, partially_typed, fully_typed)
 
-# File: symbex/lib.py Line: 11
+# File: symbex/lib.py Line: 105
+def function_definition(function_node: AST)
+
+# File: symbex/lib.py Line: 12
 def find_symbol_nodes(code: str, filename: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]
 
-# File: symbex/lib.py Line: 159
+# File: symbex/lib.py Line: 173
 def class_definition(class_def)
 
-# File: symbex/lib.py Line: 193
+# File: symbex/lib.py Line: 207
 def annotation_definition(annotation: AST) -> str
 
-# File: symbex/lib.py Line: 211
+# File: symbex/lib.py Line: 225
 def read_file(path)
 
-# File: symbex/lib.py Line: 237
+# File: symbex/lib.py Line: 251
 class TypeSummary
 
-# File: symbex/lib.py Line: 242
+# File: symbex/lib.py Line: 256
 def type_summary(node: AST) -> Optional[TypeSummary]
 
-# File: symbex/lib.py Line: 35
-def code_for_node(code: str, node: AST, class_name: str, signatures: bool) -> Tuple[(str, int)]
+# File: symbex/lib.py Line: 302
+def quoted_string(s)
 
-# File: symbex/lib.py Line: 66
+# File: symbex/lib.py Line: 36
+def code_for_node(code: str, node: AST, class_name: str, signatures: bool, docstrings: bool) -> Tuple[(str, int)]
+
+# File: symbex/lib.py Line: 70
+def add_docstring(definition: str, node: AST, docstrings: bool, is_method: bool) -> str
+
+# File: symbex/lib.py Line: 80
 def match(name: str, symbols: Iterable[str]) -> bool
-
-# File: symbex/lib.py Line: 91
-def function_definition(function_node: AST)
 ```
 <!-- [[[end]]] -->
 This can be combined with other options, or you can run `symbex -s` to see every symbol in the current directory and its subdirectories.
+
+To include docstrings in those signatures, use `--docstrings`:
+```bash
+symbex --docstrings --documented -f symbex/lib.py
+```
+
+<!-- [[[cog
+runner = CliRunner()
+result = runner.invoke(cli, ["--docstrings", "--documented", "-f", str(path / "lib.py")])
+# Need a consistent sort order
+chunks = result.stdout.strip().split("\n\n")
+chunks.sort()
+cog.out(
+    "```python\n{}\n```\n".format("\n\n".join(chunks))
+)
+]]] -->
+```python
+# File: symbex/lib.py Line: 12
+def find_symbol_nodes(code: str, filename: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]
+    "Returns ast Nodes matching symbols"
+
+# File: symbex/lib.py Line: 36
+def code_for_node(code: str, node: AST, class_name: str, signatures: bool, docstrings: bool) -> Tuple[(str, int)]
+    "Returns the code for a given node"
+
+# File: symbex/lib.py Line: 80
+def match(name: str, symbols: Iterable[str]) -> bool
+    "Returns True if name matches any of the symbols, resolving wildcards"
+```
+<!-- [[[end]]] -->
 
 ## Counting symbols
 
@@ -261,11 +298,14 @@ Options:
   -f, --file FILE            Files to search
   -d, --directory DIRECTORY  Directories to search
   -s, --signatures           Show just function and class signatures
+  --docstrings               Show function and class signatures plus docstrings
   --count                    Show count of matching symbols
   --silent                   Silently ignore Python files with parse errors
   --async                    Filter async functions
   --function                 Filter functions
   --class                    Filter classes
+  --documented               Filter functions with docstrings
+  --undocumented             Filter functions without docstrings
   --typed                    Filter functions with type annotations
   --untyped                  Filter functions without type annotations
   --partially-typed          Filter functions with partial type annotations

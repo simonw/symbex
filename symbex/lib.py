@@ -5,6 +5,7 @@ import codecs
 from dataclasses import dataclass
 from itertools import zip_longest
 import re
+import textwrap
 from typing import Iterable, List, Optional, Tuple
 
 
@@ -33,7 +34,7 @@ def find_symbol_nodes(
 
 
 def code_for_node(
-    code: str, node: AST, class_name: str, signatures: bool
+    code: str, node: AST, class_name: str, signatures: bool, docstrings: bool
 ) -> Tuple[str, int]:
     "Returns the code for a given node"
     lines = code.split("\n")
@@ -44,9 +45,12 @@ def code_for_node(
             definition, lineno = function_definition(node), node.lineno
             if class_name:
                 definition = "    " + definition
+            definition = add_docstring(definition, node, docstrings, bool(class_name))
             return definition, lineno
         elif isinstance(node, ClassDef):
-            return class_definition(node), node.lineno
+            definition, lineno = class_definition(node), node.lineno
+            definition = add_docstring(definition, node, docstrings, bool(class_name))
+            return definition, lineno
         else:
             # Not a function or class, fall back on just the line
             start = node.lineno - 1
@@ -61,6 +65,16 @@ def code_for_node(
     output = "\n".join(lines[start:end])
     # If it's in a class, indent it 4 spaces
     return output, start + 1
+
+
+def add_docstring(definition: str, node: AST, docstrings: bool, is_method: bool) -> str:
+    if not docstrings:
+        return definition
+    docstring = ast.get_docstring(node)
+    if not docstring:
+        return definition
+    docstring = quoted_string(docstring)
+    return f"{definition}\n{textwrap.indent(docstring, '        ' if is_method else '    ')}"
 
 
 def match(name: str, symbols: Iterable[str]) -> bool:
@@ -283,3 +297,14 @@ def type_summary(node: AST) -> Optional[TypeSummary]:
         fully=fully,
         partially=partially,
     )
+
+
+def quoted_string(s):
+    if "\n" in s:
+        # Escape triple double quotes
+        s = s.replace('"""', '\\"\\"\\"')
+        return f'"""{s}"""'
+    else:
+        # Escape double quotes
+        s = s.replace('"', '\\"')
+        return f'"{s}"'

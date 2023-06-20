@@ -3,11 +3,14 @@ from typing import Union, Tuple
 
 # Function with no arguments
 def func_no_args():
+    "This has a single line docstring"
     pass
 
 
 # Function with positional arguments
 def func_positional_args(a, b, c):
+    """This has a
+    multi-line docstring"""
     pass
 
 
@@ -139,9 +142,12 @@ class ClassForTypedTests:
         pass
 
     def method_fully_typed(self, a: int, b: str) -> bool:
+        "Single line"
         pass
 
     def method_partially_typed(self, a: int, b) -> bool:
+        """Multiple
+        lines"""
         pass
 
     def method_untyped(self, a, b):
