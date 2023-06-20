@@ -174,13 +174,20 @@ def cli(
             # node can match any of the specified types
             if async_ and isinstance(node, ast.AsyncFunctionDef):
                 return True
-            if function and isinstance(node, ast.FunctionDef):
+            if function and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 return True
             if class_ and isinstance(node, ast.ClassDef):
                 return True
             summary = annotation_summary(node)
             # TODO: Refactor this, also handle return types
-            if typed and summary and (summary.num_arguments and summary.num_typed):
+            if (
+                typed
+                and summary
+                and (
+                    (summary.num_arguments and summary.num_typed)
+                    or summary.return_is_typed
+                )
+            ):
                 return True
             if (
                 untyped
@@ -193,7 +200,10 @@ def cli(
                 partially_typed
                 and summary
                 and summary.num_typed
-                and summary.num_typed < summary.num_arguments
+                and (
+                    (summary.num_typed < summary.num_arguments)
+                    or not summary.return_is_typed
+                )
             ):
                 return True
             if fully_typed and summary and summary.num_typed == summary.num_arguments:
