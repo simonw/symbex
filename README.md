@@ -7,6 +7,8 @@
 
 Find the Python code for specified symbols
 
+Read [symbex: search Python code for functions and classes, then pipe them into a LLM](https://simonwillison.net/2023/Jun/18/symbex/) for background on this project.
+
 ## Installation
 
 Install this tool using `pip`:
