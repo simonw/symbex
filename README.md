@@ -195,6 +195,65 @@ And got back this:
 - [pyastgrep](https://github.com/spookylukey/pyastgrep) by Luke Plant offers advanced capabilities for viewing and searching through Python ASTs using XPath.
 - [cq](https://github.com/fullstackio/cq) is a tool thet lets you "extract code snippets using CSS-like selectors", built using [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) and primarily targetting JavaScript and TypeScript.
 
+## symbex --help
+
+<!-- [[[cog
+import cog
+result2 = runner.invoke(cli, ["--help"])
+help = result2.output.replace("Usage: cli", "Usage: symbex")
+cog.out(
+    "```\n{}\n```".format(help)
+)
+]]] -->
+```
+Usage: symbex [OPTIONS] [SYMBOLS]...
+
+  Find symbols in Python code and print the code for them.
+
+  Example usage:
+
+      # Search current directory and subdirectories
+      symbex my_function MyClass
+  
+      # Search using a wildcard
+      symbex 'test_*'
+
+      # Find a specific class method
+      symbex 'MyClass.my_method'
+
+      # Find class methods using wildcards
+      symbex '*View.handle_*'
+
+      # Search a specific file
+      symbex MyClass -f my_file.py
+  
+      # Search within a specific directory and its subdirectories
+      symbex Database -d ~/projects/datasette
+
+      # View signatures for all symbols in current directory and subdirectories
+      symbex -s
+
+      # View signatures for all test functions
+      symbex 'test_*' -s
+
+Options:
+  --version                  Show the version and exit.
+  -f, --file FILE            Files to search
+  -d, --directory DIRECTORY  Directories to search
+  -s, --signatures           Show just function and class signatures
+  --silent                   Silently ignore Python files with parse errors
+  --async                    Filter async functions
+  --function                 Filter functions
+  --class                    Filter classes
+  --typed                    Filter functions with type annotations
+  --untyped                  Filter functions without type annotations
+  --partially-typed          Filter functions with partial type annotations
+  --fully-typed              Filter functions with full type annotations
+  --help                     Show this message and exit.
+
+```
+<!-- [[[end]]] -->
+
 ## Development
 
 To contribute to this tool, first checkout the code. Then create a new virtual environment:
