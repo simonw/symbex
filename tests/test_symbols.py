@@ -111,14 +111,15 @@ def func_positional_args(a, b, c)
     assert actual == expected
 
 
-def test_imports():
+@pytest.mark.parametrize("no_file", (False, True))
+def test_imports(no_file):
     runner = CliRunner()
     args = [
         "func_arbitrary*",
         "--imports",
         "-d",
         str(pathlib.Path(__file__).parent),
-    ]
+    ] + (["--no-file"] if no_file else [])
     result = runner.invoke(cli, args, catch_exceptions=False)
     assert result.exit_code == 0
     expected = """
@@ -134,4 +135,8 @@ def func_arbitrary_keyword_args(**kwargs)
 # from .example_symbols import func_arbitrary_args
 def func_arbitrary_args(*args, **kwargs)
     """.strip()
+    if no_file:
+        lines = expected.split("\n")
+        lines = [line for line in lines if not line.startswith("# File: ")]
+        expected = "\n".join(lines)
     assert result.output.strip() == expected

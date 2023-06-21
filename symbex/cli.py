@@ -51,6 +51,12 @@ from .lib import (
     help="Show 'from x import y' lines for imported symbols",
 )
 @click.option(
+    "-n",
+    "--no-file",
+    is_flag=True,
+    help="Don't include the # File: comments in the output",
+)
+@click.option(
     "--docstrings",
     is_flag=True,
     help="Show function and class signatures plus docstrings",
@@ -119,6 +125,7 @@ def cli(
     excludes,
     signatures,
     imports,
+    no_file,
     docstrings,
     count,
     silent,
@@ -306,11 +313,12 @@ def cli(
             snippet, line_no = code_for_node(
                 code, node, class_name, signatures, docstrings
             )
-            bits = ["# File:", path]
-            if class_name:
-                bits.extend(["Class:", class_name])
-            bits.extend(["Line:", line_no])
-            print(*bits)
+            if not no_file:
+                bits = ["# File:", path]
+                if class_name:
+                    bits.extend(["Class:", class_name])
+                bits.extend(["Line:", line_no])
+                print(*bits)
             if imports:
                 print("#", import_line_for_function(node.name, path, directories))
             print(snippet)

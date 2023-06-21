@@ -153,10 +153,10 @@ cog.out(
 )
 ]]] -->
 ```python
-# File: symbex/cli.py Line: 115
-def cli(symbols, files, directories, excludes, signatures, imports, docstrings, count, silent, async_, function, class_, documented, undocumented, typed, untyped, partially_typed, fully_typed)
+# File: symbex/cli.py Line: 121
+def cli(symbols, files, directories, excludes, signatures, imports, no_file, docstrings, count, silent, async_, function, class_, documented, undocumented, typed, untyped, partially_typed, fully_typed)
 
-# File: symbex/cli.py Line: 322
+# File: symbex/cli.py Line: 330
 def is_subpath(path: ?, parent: ?) -> bool
 
 # File: symbex/lib.py Line: 106
@@ -216,6 +216,25 @@ cog.out(
 def match(name: str, symbols: Iterable[str]) -> bool
 ```
 <!-- [[[end]]] -->
+To suppress the `# File: ...` comments, use `--no-file` or `-n`.
+
+So to both enable import paths and suppress File comments, use `-in` as a shortcut:
+```bash
+symbex -in match
+```
+Output:
+<!-- [[[cog
+result = runner.invoke(cli, ["-in", str(path / "lib.py"), "match"])
+cog.out(
+    "```python\n{}\n```\n".format(result.stdout.strip())
+)
+]]] -->
+```python
+# from symbex.lib import match
+def match(name: str, symbols: Iterable[str]) -> bool
+```
+<!-- [[[end]]] -->
+
 To include docstrings in those signatures, use `--docstrings`:
 ```bash
 symbex --docstrings match -f symbex/lib.py
@@ -319,6 +338,7 @@ Options:
   -x, --exclude DIRECTORY    Directories to exclude
   -s, --signatures           Show just function and class signatures
   -i, --imports              Show 'from x import y' lines for imported symbols
+  -n, --no-file              Don't include the # File: comments in the output
   --docstrings               Show function and class signatures plus docstrings
   --count                    Show count of matching symbols
   --silent                   Silently ignore Python files with parse errors
