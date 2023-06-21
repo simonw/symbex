@@ -2,7 +2,13 @@ import ast
 import click
 import pathlib
 
-from .lib import code_for_node, find_symbol_nodes, read_file, type_summary
+from .lib import (
+    code_for_node,
+    find_symbol_nodes,
+    import_line_for_function,
+    read_file,
+    type_summary,
+)
 
 
 @click.command()
@@ -37,6 +43,11 @@ from .lib import code_for_node, find_symbol_nodes, read_file, type_summary
     "--signatures",
     is_flag=True,
     help="Show just function and class signatures",
+)
+@click.option(
+    "--imports",
+    is_flag=True,
+    help="Show 'from x import y' lines for imported symbols",
 )
 @click.option(
     "--docstrings",
@@ -106,6 +117,7 @@ def cli(
     directories,
     excludes,
     signatures,
+    imports,
     docstrings,
     count,
     silent,
@@ -164,7 +176,7 @@ def cli(
         # Count the number of --async functions in the project
         symbex --async --count
     """
-    if count or docstrings:
+    if count or docstrings or imports:
         signatures = True
     # Show --help if no filter options are provided:
     if not any(
@@ -298,6 +310,8 @@ def cli(
                 bits.extend(["Class:", class_name])
             bits.extend(["Line:", line_no])
             print(*bits)
+            if imports:
+                print("#", import_line_for_function(node.name, path, directories))
             print(snippet)
             print()
     if count:

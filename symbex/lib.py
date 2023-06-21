@@ -4,6 +4,7 @@ from ast import literal_eval, parse, AST, AsyncFunctionDef, FunctionDef, ClassDe
 import codecs
 from dataclasses import dataclass
 from itertools import zip_longest
+from pathlib import Path
 import re
 import textwrap
 from typing import Iterable, List, Optional, Tuple
@@ -308,3 +309,33 @@ def quoted_string(s):
         # Escape double quotes
         s = s.replace('"', '\\"')
         return f'"{s}"'
+
+
+def import_line_for_function(
+    function_name: str, filepath: str, possible_root_dirs: List[str]
+) -> str:
+    """
+    Returns e.g. from foo.bar import baz if filepath is /Users/dev/foo/bar.py and function_name is baz
+    and possible_root_dirs is a list that contains /Users/dev
+    """
+    filepath = Path(filepath)  # Convert the filepath string to a Path object
+    filename_without_extension = filepath.stem  # Get filename without extension
+
+    # Check for matches in possible_root_dirs
+    for root_dir in possible_root_dirs:
+        root_dir = Path(root_dir)  # Convert the root_dir string to a Path object
+        try:
+            relative_path = filepath.relative_to(root_dir)
+            # Convert path separators to dots and assemble import line
+            import_path = ".".join(
+                relative_path.parts[:-1] + (filename_without_extension,)
+            )
+            return f"from {import_path} import {function_name}"
+        except ValueError:
+            # If the ValueError is raised, it means the filepath is not under the root_dir,
+            # so we just continue to the next iteration
+            continue
+
+    # If we haven't returned by this point, none of the root_dirs matched
+    # So return a relative import
+    return f"from .{filename_without_extension} import {function_name}"

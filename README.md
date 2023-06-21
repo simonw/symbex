@@ -153,70 +153,82 @@ cog.out(
 )
 ]]] -->
 ```python
-# File: symbex/cli.py Line: 95
-def cli(symbols, files, directories, signatures, docstrings, count, silent, async_, function, class_, documented, undocumented, typed, untyped, partially_typed, fully_typed)
+# File: symbex/cli.py Line: 114
+def cli(symbols, files, directories, excludes, signatures, imports, docstrings, count, silent, async_, function, class_, documented, undocumented, typed, untyped, partially_typed, fully_typed)
 
-# File: symbex/lib.py Line: 105
+# File: symbex/cli.py Line: 321
+def is_subpath(path: ?, parent: ?) -> bool
+
+# File: symbex/lib.py Line: 106
 def function_definition(function_node: AST)
 
-# File: symbex/lib.py Line: 12
+# File: symbex/lib.py Line: 13
 def find_symbol_nodes(code: str, filename: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]
 
-# File: symbex/lib.py Line: 173
+# File: symbex/lib.py Line: 174
 def class_definition(class_def)
 
-# File: symbex/lib.py Line: 207
+# File: symbex/lib.py Line: 208
 def annotation_definition(annotation: AST) -> str
 
-# File: symbex/lib.py Line: 225
+# File: symbex/lib.py Line: 226
 def read_file(path)
 
-# File: symbex/lib.py Line: 251
+# File: symbex/lib.py Line: 252
 class TypeSummary
 
-# File: symbex/lib.py Line: 256
+# File: symbex/lib.py Line: 257
 def type_summary(node: AST) -> Optional[TypeSummary]
 
-# File: symbex/lib.py Line: 302
+# File: symbex/lib.py Line: 303
 def quoted_string(s)
 
-# File: symbex/lib.py Line: 36
+# File: symbex/lib.py Line: 314
+def import_line_for_function(function_name: str, filepath: str, possible_root_dirs: List[str]) -> str
+
+# File: symbex/lib.py Line: 37
 def code_for_node(code: str, node: AST, class_name: str, signatures: bool, docstrings: bool) -> Tuple[(str, int)]
 
-# File: symbex/lib.py Line: 70
+# File: symbex/lib.py Line: 71
 def add_docstring(definition: str, node: AST, docstrings: bool, is_method: bool) -> str
 
-# File: symbex/lib.py Line: 80
+# File: symbex/lib.py Line: 81
 def match(name: str, symbols: Iterable[str]) -> bool
 ```
 <!-- [[[end]]] -->
 This can be combined with other options, or you can run `symbex -s` to see every symbol in the current directory and its subdirectories.
 
-To include docstrings in those signatures, use `--docstrings`:
-```bash
-symbex --docstrings --documented -f symbex/lib.py
-```
+To include estimated import paths, such as `# from symbex.lib import match`, use `--imports`:
 
+```bash
+symbex --imports match
+```
+Example output:
 <!-- [[[cog
-runner = CliRunner()
-result = runner.invoke(cli, ["--docstrings", "--documented", "-f", str(path / "lib.py")])
-# Need a consistent sort order
-chunks = result.stdout.strip().split("\n\n")
-chunks.sort()
+result = runner.invoke(cli, ["--imports", "-d", str(path), "match"])
 cog.out(
-    "```python\n{}\n```\n".format("\n\n".join(chunks))
+    "```python\n{}\n```\n".format(result.stdout.strip())
 )
 ]]] -->
 ```python
-# File: symbex/lib.py Line: 12
-def find_symbol_nodes(code: str, filename: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]
-    "Returns ast Nodes matching symbols"
-
-# File: symbex/lib.py Line: 36
-def code_for_node(code: str, node: AST, class_name: str, signatures: bool, docstrings: bool) -> Tuple[(str, int)]
-    "Returns the code for a given node"
-
-# File: symbex/lib.py Line: 80
+# File: symbex/lib.py Line: 81
+# from .lib import match
+def match(name: str, symbols: Iterable[str]) -> bool
+```
+<!-- [[[end]]] -->
+To include docstrings in those signatures, use `--docstrings`:
+```bash
+symbex --docstrings match -f symbex/lib.py
+```
+Example output:
+<!-- [[[cog
+result = runner.invoke(cli, ["--docstrings", "match", "-f", str(path / "lib.py")])
+cog.out(
+    "```python\n{}\n```\n".format(result.stdout.strip())
+)
+]]] -->
+```python
+# File: symbex/lib.py Line: 81
 def match(name: str, symbols: Iterable[str]) -> bool
     "Returns True if name matches any of the symbols, resolving wildcards"
 ```
@@ -257,7 +269,6 @@ And got back this:
 ## symbex --help
 
 <!-- [[[cog
-import cog
 result2 = runner.invoke(cli, ["--help"])
 help = result2.output.replace("Usage: cli", "Usage: symbex")
 cog.out(
@@ -307,6 +318,7 @@ Options:
   -d, --directory DIRECTORY  Directories to search
   -x, --exclude DIRECTORY    Directories to exclude
   -s, --signatures           Show just function and class signatures
+  --imports                  Show 'from x import y' lines for imported symbols
   --docstrings               Show function and class signatures plus docstrings
   --count                    Show count of matching symbols
   --silent                   Silently ignore Python files with parse errors
