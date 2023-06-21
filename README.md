@@ -142,14 +142,16 @@ from click.testing import CliRunner
 import pathlib
 from symbex.cli import cli
 
+def sorted_chunks(text):
+    chunks = text.strip().split("\n\n")
+    chunks.sort()
+    return "\n\n".join(chunks)
+
 path = pathlib.Path("symbex").resolve()
 runner = CliRunner()
 result = runner.invoke(cli, ["-s", "-d", str(path)])
-# Need a consistent sort order
-chunks = result.stdout.strip().split("\n\n")
-chunks.sort()
 cog.out(
-    "```python\n{}\n```\n".format("\n\n".join(chunks))
+    "```python\n{}\n```\n".format(sorted_chunks(result.output))
 )
 ]]] -->
 ```python
@@ -223,17 +225,10 @@ So to both enable import paths and suppress File comments, use `-in` as a shortc
 symbex -in match
 ```
 Output:
-<!-- [[[cog
-result = runner.invoke(cli, ["-in", str(path / "lib.py"), "match"])
-cog.out(
-    "```python\n{}\n```\n".format(result.stdout.strip())
-)
-]]] -->
 ```python
 # from symbex.lib import match
 def match(name: str, symbols: Iterable[str]) -> bool
 ```
-<!-- [[[end]]] -->
 
 To include docstrings in those signatures, use `--docstrings`:
 ```bash
