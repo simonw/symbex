@@ -15,6 +15,10 @@ Install this tool using `pip`:
 ```bash
 pip install symbex
 ```
+Or using Homebrew:
+```bash
+brew install simonw/llm/symbex
+```
 ## Usage
 
 `symbex` can search for names of functions and classes that occur at the top level of a Python file.
