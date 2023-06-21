@@ -45,6 +45,7 @@ from .lib import (
     help="Show just function and class signatures",
 )
 @click.option(
+    "-i",
     "--imports",
     is_flag=True,
     help="Show 'from x import y' lines for imported symbols",

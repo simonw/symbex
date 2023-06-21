@@ -153,10 +153,10 @@ cog.out(
 )
 ]]] -->
 ```python
-# File: symbex/cli.py Line: 114
+# File: symbex/cli.py Line: 115
 def cli(symbols, files, directories, excludes, signatures, imports, docstrings, count, silent, async_, function, class_, documented, undocumented, typed, untyped, partially_typed, fully_typed)
 
-# File: symbex/cli.py Line: 321
+# File: symbex/cli.py Line: 322
 def is_subpath(path: ?, parent: ?) -> bool
 
 # File: symbex/lib.py Line: 106
@@ -318,7 +318,7 @@ Options:
   -d, --directory DIRECTORY  Directories to search
   -x, --exclude DIRECTORY    Directories to exclude
   -s, --signatures           Show just function and class signatures
-  --imports                  Show 'from x import y' lines for imported symbols
+  -i, --imports              Show 'from x import y' lines for imported symbols
   --docstrings               Show function and class signatures plus docstrings
   --count                    Show count of matching symbols
   --silent                   Silently ignore Python files with parse errors
