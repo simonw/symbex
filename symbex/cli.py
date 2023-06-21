@@ -25,6 +25,14 @@ from .lib import code_for_node, find_symbol_nodes, read_file, type_summary
     help="Directories to search",
 )
 @click.option(
+    "excludes",
+    "-x",
+    "--exclude",
+    type=click.Path(file_okay=False, dir_okay=True, resolve_path=True),
+    multiple=True,
+    help="Directories to exclude",
+)
+@click.option(
     "-s",
     "--signatures",
     is_flag=True,
@@ -96,6 +104,7 @@ def cli(
     symbols,
     files,
     directories,
+    excludes,
     signatures,
     docstrings,
     count,
@@ -198,10 +207,15 @@ def cli(
     if not files and not directories:
         directories = ["."]
 
+    excludes = [pathlib.Path(exclude) for exclude in excludes]
+
     def iterate_files():
         yield from (pathlib.Path(f) for f in files)
         for directory in directories:
             for path in pathlib.Path(directory).rglob("*.py"):
+                # Skip if path is inside any of 'excludes'
+                if any(is_subpath(path, exclude) for exclude in excludes):
+                    continue
                 if path.is_file():
                     yield path
 
@@ -288,3 +302,11 @@ def cli(
             print()
     if count:
         click.echo(num_matches)
+
+
+def is_subpath(path: pathlib.Path, parent: pathlib.Path) -> bool:
+    try:
+        path.relative_to(parent)
+        return True
+    except ValueError:
+        return False

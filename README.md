@@ -55,9 +55,13 @@ To search within a specific file, pass that file using the `-f` option. You can 
 ```bash
 symbex MyClass -f my_file.py
 ```
-To search within a specific directory and all of its subdirectories, use the `-d` option:
+To search within a specific directory and all of its subdirectories, use the `-d/--directory` option:
 ```bash
 symbex Database -d ~/projects/datasette
+```
+You can exclude files in specified directories using the `-x/--exclude` option:
+```bash
+symbex Database -d ~/projects/datasette -x ~/projects/datasette/tests
 ```
 If `symbex` encounters any Python code that it cannot parse, it will print a warning message and continue searching:
 ```
@@ -301,6 +305,7 @@ Options:
   --version                  Show the version and exit.
   -f, --file FILE            Files to search
   -d, --directory DIRECTORY  Directories to search
+  -x, --exclude DIRECTORY    Directories to exclude
   -s, --signatures           Show just function and class signatures
   --docstrings               Show function and class signatures plus docstrings
   --count                    Show count of matching symbols
