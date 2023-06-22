@@ -1,7 +1,6 @@
 # Tests for "symbex --imports --sys-path ..."
 import pathlib
 import pytest
-import re
 from click.testing import CliRunner
 
 from symbex.cli import cli
@@ -15,7 +14,10 @@ def imports_dir(tmpdir):
         ("two/foo.py", "def foo2():\n    pass"),
         ("two/bar.py", "def bar2():\n    pass"),
         ("deep/nested/three/foo.py", "def foo3():\n    pass"),
-        ("deep/nested/three/bar.py", "def bar3():\n    pass"),
+        (
+            "deep/nested/three/bar.py",
+            ("class Bar3:\n" "    def __init__(self):\n" "        pass"),
+        ),
     ):
         p = pathlib.Path(tmpdir / path)
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -33,8 +35,10 @@ def imports_dir(tmpdir):
         (["foo2"], "one/", "from .foo import foo2"),
         # Various deep nested examples
         (["foo3"], None, "from deep.nested.three.foo import foo3"),
-        (["bar3"], None, "from deep.nested.three.bar import bar3"),
+        (["Bar3"], None, "from deep.nested.three.bar import Bar3"),
         (["foo3"], "deep/nested", "from three.foo import foo3"),
+        # Test display of methods
+        (["Bar3.*"], "deep/nested", "from three.bar import Bar3"),
     ),
 )
 def test_imports(args, sys_path, expected, imports_dir):

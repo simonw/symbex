@@ -346,14 +346,19 @@ def cli(
                 if class_name:
                     bits.extend(["Class:", class_name])
                 bits.extend(["Line:", line_no])
-                print(*bits)
+                click.echo(" ".join(str(bit) for bit in bits))
             if imports:
-                print(
-                    "#",
-                    import_line_for_function(node.name, path, sys_paths or directories),
+                import_line = import_line_for_function(
+                    node.name, path, sys_paths or directories
                 )
-            print(snippet)
-            print()
+                # If it's a class then output '# from x import Class' instead
+                if class_name:
+                    import_line = (
+                        import_line.split(" import ")[0] + " import " + class_name
+                    )
+                click.echo("# " + import_line)
+            click.echo(snippet)
+            click.echo()
     if count:
         click.echo(num_matches)
 
