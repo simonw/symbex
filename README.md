@@ -59,6 +59,19 @@ To search within a specific directory and all of its subdirectories, use the `-d
 ```bash
 symbex Database -d ~/projects/datasette
 ```
+You can search the directory containing the Python standard library using `--stdlib`. This can be useful for quickly looking up the source code for specific Python library functions:
+```bash
+symbex --stdlib -in to_thread
+```
+`-in` is explained below. If you provide `--stdlib` without any `-d` or `-f` options then `--silent` will be turned on automatically, since the standard library otherwise produces a number of different warnings.
+
+The output starts like this:
+```python
+# from asyncio.threads import to_thread
+async def to_thread(func, /, *args, **kwargs):
+    """Asynchronously run function *func* in a separate thread.
+    # ...
+```
 You can exclude files in specified directories using the `-x/--exclude` option:
 ```bash
 symbex Database -d ~/projects/datasette -x ~/projects/datasette/tests
@@ -336,6 +349,7 @@ Options:
   --version                  Show the version and exit.
   -f, --file FILE            Files to search
   -d, --directory DIRECTORY  Directories to search
+  --stdlib                   Search the Python standard library
   -x, --exclude DIRECTORY    Directories to exclude
   -s, --signatures           Show just function and class signatures
   -n, --no-file              Don't include the # File: comments in the output

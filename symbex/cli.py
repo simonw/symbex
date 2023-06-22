@@ -30,6 +30,7 @@ from .lib import (
     multiple=True,
     help="Directories to search",
 )
+@click.option("--stdlib", is_flag=True, help="Search the Python standard library")
 @click.option(
     "excludes",
     "-x",
@@ -133,6 +134,7 @@ def cli(
     symbols,
     files,
     directories,
+    stdlib,
     excludes,
     signatures,
     no_file,
@@ -199,6 +201,10 @@ def cli(
     """
     if no_init:
         fully_typed = True
+    if stdlib and not directories and not files:
+        silent = True
+    if stdlib:
+        directories = [*directories, *[pathlib.Path(pathlib.__file__).parent.resolve()]]
     if count or docstrings:
         signatures = True
     if imports and not symbols:
