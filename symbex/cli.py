@@ -124,6 +124,11 @@ from .lib import (
     is_flag=True,
     help="Filter functions with full type annotations",
 )
+@click.option(
+    "--no-init",
+    is_flag=True,
+    help="Filter to exclude any __init__ methods",
+)
 def cli(
     symbols,
     files,
@@ -145,6 +150,7 @@ def cli(
     untyped,
     partially_typed,
     fully_typed,
+    no_init,
 ):
     """
     Find symbols in Python code and print the code for them.
@@ -191,6 +197,8 @@ def cli(
         # Count the number of --async functions in the project
         symbex --async --count
     """
+    if no_init:
+        fully_typed = True
     if count or docstrings:
         signatures = True
     if imports and not symbols:
@@ -209,6 +217,7 @@ def cli(
             untyped,
             partially_typed,
             fully_typed,
+            no_init,
         ]
     ):
         ctx = click.get_current_context()
@@ -228,6 +237,7 @@ def cli(
                 untyped,
                 partially_typed,
                 fully_typed,
+                no_init,
             ]
         )
         and not symbols
@@ -264,6 +274,7 @@ def cli(
             untyped,
             partially_typed,
             fully_typed,
+            no_init,
         ]
     ):
 
@@ -283,7 +294,9 @@ def cli(
                 return False
             summary = type_summary(node)
             # if no summary, type filters all fail
-            if not summary and (typed or untyped or partially_typed or fully_typed):
+            if not summary and (
+                typed or untyped or partially_typed or fully_typed or no_init
+            ):
                 return False
             # Apply type filters
             if typed and not summary.partially:

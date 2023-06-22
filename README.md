@@ -86,6 +86,7 @@ The following filters are available:
 - `--untyped` - functions that have no type annotations
 - `--partially-typed` - functions that have some type annotations but not all
 - `--fully-typed` - functions that have type annotations for every argument and the return value
+- `--no-init` - Exclude `__init__(self)` methods. This is useful when combined with `--fully-typed '*.*'` to avoid returning `__init__(self)` methods that would otherwise be classified as fully typed, since `__init__` doesn't need argument or return type annotations.
 
 For example, to see the signatures of every `async def` function in your project that doesn't have any type annotations:
 
@@ -95,10 +96,10 @@ symbex -s --async --untyped
 
 For class methods instead of functions, you can combine filters with a symbol search argument of `*.*`.
 
-This example shows the full source code of every class method in your project with type annotations on all of the arguments and the return value:
+This example shows the full source code of every class method in the Python standard library that has type annotations for all of the arguments and the return value:
 
 ```bash
-symbex --fully-typed '*.*'
+symbex --fully-typed --no-init '*.*' --stdlib
 ```
 
 ### Example output
@@ -352,6 +353,7 @@ Options:
   --untyped                  Filter functions without type annotations
   --partially-typed          Filter functions with partial type annotations
   --fully-typed              Filter functions with full type annotations
+  --no-init                  Filter to exclude any __init__ methods
   --help                     Show this message and exit.
 
 ```
