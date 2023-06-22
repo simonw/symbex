@@ -134,7 +134,7 @@ class PatternPortfolioView(View):
 
 The `-s/--signatures` option will list just the signatures of the functions and classes, for example:
 ```bash
-symbex -s -d symbex
+symbex -s -f symbex/lib.py
 ```
 <!-- [[[cog
 import cog
@@ -149,18 +149,12 @@ def sorted_chunks(text):
 
 path = pathlib.Path("symbex").resolve()
 runner = CliRunner()
-result = runner.invoke(cli, ["-s", "-d", str(path)])
+result = runner.invoke(cli, ["-s", "-f", str(path / "lib.py")])
 cog.out(
     "```python\n{}\n```\n".format(sorted_chunks(result.output))
 )
 ]]] -->
 ```python
-# File: symbex/cli.py Line: 121
-def cli(symbols, files, directories, excludes, signatures, imports, no_file, docstrings, count, silent, async_, function, class_, documented, undocumented, typed, untyped, partially_typed, fully_typed)
-
-# File: symbex/cli.py Line: 330
-def is_subpath(path: ?, parent: ?) -> bool
-
 # File: symbex/lib.py Line: 106
 def function_definition(function_node: AST)
 
@@ -200,43 +194,54 @@ def match(name: str, symbols: Iterable[str]) -> bool
 <!-- [[[end]]] -->
 This can be combined with other options, or you can run `symbex -s` to see every symbol in the current directory and its subdirectories.
 
-To include estimated import paths, such as `# from symbex.lib import match`, use `--imports`:
+To include estimated import paths, such as `# from symbex.lib import match`, use `--imports`. These will be calculated relative to the directory you specified, or you can pass one or more `--sys-path` options to request that imports are calculated relative to those directories as if they were on `sys.path`:
 
 ```bash
-symbex --imports match
+~/dev/symbex/symbex match --imports -s --sys-path ~/dev/symbex
 ```
 Example output:
 <!-- [[[cog
-result = runner.invoke(cli, ["--imports", "-d", str(path), "match"])
+result = runner.invoke(cli, [
+    "--imports", "-d", str(path), "match", "-s", "--sys-path", str(path.parent)
+])
 cog.out(
     "```python\n{}\n```\n".format(result.stdout.strip())
 )
 ]]] -->
 ```python
 # File: symbex/lib.py Line: 81
-# from .lib import match
+# from symbex.lib import match
 def match(name: str, symbols: Iterable[str]) -> bool
 ```
 <!-- [[[end]]] -->
 To suppress the `# File: ...` comments, use `--no-file` or `-n`.
 
-So to both enable import paths and suppress File comments, use `-in` as a shortcut:
+So to both show import paths and suppress File comments, use `-in` as a shortcut:
 ```bash
 symbex -in match
 ```
 Output:
+<!-- [[[cog
+result = runner.invoke(cli, [
+    "-in", "-d", str(path), "match", "-s", "--sys-path", str(path.parent)
+])
+cog.out(
+    "```python\n{}\n```\n".format(result.stdout.strip())
+)
+]]] -->
 ```python
 # from symbex.lib import match
 def match(name: str, symbols: Iterable[str]) -> bool
 ```
+<!-- [[[end]]] -->
 
 To include docstrings in those signatures, use `--docstrings`:
 ```bash
-symbex --docstrings match -f symbex/lib.py
+symbex match --docstrings -f symbex/lib.py
 ```
 Example output:
 <!-- [[[cog
-result = runner.invoke(cli, ["--docstrings", "match", "-f", str(path / "lib.py")])
+result = runner.invoke(cli, ["match", "--docstrings", "-f", str(path / "lib.py")])
 cog.out(
     "```python\n{}\n```\n".format(result.stdout.strip())
 )
@@ -332,8 +337,9 @@ Options:
   -d, --directory DIRECTORY  Directories to search
   -x, --exclude DIRECTORY    Directories to exclude
   -s, --signatures           Show just function and class signatures
-  -i, --imports              Show 'from x import y' lines for imported symbols
   -n, --no-file              Don't include the # File: comments in the output
+  -i, --imports              Show 'from x import y' lines for imported symbols
+  --sys-path TEXT            Calculate imports relative to these on sys.path
   --docstrings               Show function and class signatures plus docstrings
   --count                    Show count of matching symbols
   --silent                   Silently ignore Python files with parse errors

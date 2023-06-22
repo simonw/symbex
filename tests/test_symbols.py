@@ -117,6 +117,7 @@ def test_imports(no_file):
     args = [
         "func_arbitrary*",
         "--imports",
+        "-s",
         "-d",
         str(pathlib.Path(__file__).parent),
     ] + (["--no-file"] if no_file else [])
@@ -124,15 +125,15 @@ def test_imports(no_file):
     assert result.exit_code == 0
     expected = """
 # File: tests/example_symbols.py Line: 28
-# from .example_symbols import func_arbitrary_positional_args
+# from example_symbols import func_arbitrary_positional_args
 def func_arbitrary_positional_args(*args)
 
 # File: tests/example_symbols.py Line: 33
-# from .example_symbols import func_arbitrary_keyword_args
+# from example_symbols import func_arbitrary_keyword_args
 def func_arbitrary_keyword_args(**kwargs)
 
 # File: tests/example_symbols.py Line: 38
-# from .example_symbols import func_arbitrary_args
+# from example_symbols import func_arbitrary_args
 def func_arbitrary_args(*args, **kwargs)
     """.strip()
     if no_file:

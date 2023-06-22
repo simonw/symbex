@@ -45,16 +45,22 @@ from .lib import (
     help="Show just function and class signatures",
 )
 @click.option(
+    "-n",
+    "--no-file",
+    is_flag=True,
+    help="Don't include the # File: comments in the output",
+)
+@click.option(
     "-i",
     "--imports",
     is_flag=True,
     help="Show 'from x import y' lines for imported symbols",
 )
 @click.option(
-    "-n",
-    "--no-file",
-    is_flag=True,
-    help="Don't include the # File: comments in the output",
+    "sys_paths",
+    "--sys-path",
+    multiple=True,
+    help="Calculate imports relative to these on sys.path",
 )
 @click.option(
     "--docstrings",
@@ -124,8 +130,9 @@ def cli(
     directories,
     excludes,
     signatures,
-    imports,
     no_file,
+    imports,
+    sys_paths,
     docstrings,
     count,
     silent,
@@ -184,7 +191,9 @@ def cli(
         # Count the number of --async functions in the project
         symbex --async --count
     """
-    if count or docstrings or imports:
+    if count or docstrings:
+        signatures = True
+    if imports and not symbols:
         signatures = True
     # Show --help if no filter options are provided:
     if not any(
@@ -320,7 +329,10 @@ def cli(
                 bits.extend(["Line:", line_no])
                 print(*bits)
             if imports:
-                print("#", import_line_for_function(node.name, path, directories))
+                print(
+                    "#",
+                    import_line_for_function(node.name, path, sys_paths or directories),
+                )
             print(snippet)
             print()
     if count:

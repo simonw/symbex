@@ -315,15 +315,16 @@ def import_line_for_function(
     function_name: str, filepath: str, possible_root_dirs: List[str]
 ) -> str:
     """
-    Returns e.g. from foo.bar import baz if filepath is /Users/dev/foo/bar.py and function_name is baz
-    and possible_root_dirs is a list that contains /Users/dev
+    Returns eg 'from foo.bar import baz' if filepath is /Users/dev/foo/bar.py
+    and function_name is baz and possible_root_dirs is a list that contains
+    /Users/dev
     """
-    filepath = Path(filepath)  # Convert the filepath string to a Path object
-    filename_without_extension = filepath.stem  # Get filename without extension
+    filepath = Path(filepath).resolve()
+    filename_without_extension = filepath.stem
 
     # Check for matches in possible_root_dirs
     for root_dir in possible_root_dirs:
-        root_dir = Path(root_dir)  # Convert the root_dir string to a Path object
+        root_dir = Path(root_dir).resolve()
         try:
             relative_path = filepath.relative_to(root_dir)
             # Convert path separators to dots and assemble import line
@@ -332,10 +333,8 @@ def import_line_for_function(
             )
             return f"from {import_path} import {function_name}"
         except ValueError:
-            # If the ValueError is raised, it means the filepath is not under the root_dir,
-            # so we just continue to the next iteration
+            # If ValueError is raised, the filepath is not under the root_dir
             continue
 
-    # If we haven't returned by this point, none of the root_dirs matched
-    # So return a relative import
+    # If none of the root_dirs matched return a relative import
     return f"from .{filename_without_extension} import {function_name}"
