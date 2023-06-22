@@ -305,15 +305,21 @@ def cli(
                 return False
             if partially_typed and not (summary.partially and not summary.fully):
                 return False
+            if no_init and node.name == "__init__":
+                return False
             if fully_typed and not summary.fully:
                 return False
-
             return True
 
     pwd = pathlib.Path(".").resolve()
     num_matches = 0
     for file in iterate_files():
-        code = read_file(file)
+        try:
+            code = read_file(file)
+        except UnicodeDecodeError as ex:
+            if not silent:
+                click.secho(f"# Unicode error in {file}: {ex}", err=True, fg="yellow")
+            continue
         try:
             nodes = find_symbol_nodes(code, str(file), symbols)
         except SyntaxError as ex:
