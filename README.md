@@ -355,7 +355,7 @@ Options:
   -n, --no-file              Don't include the # File: comments in the output
   -i, --imports              Show 'from x import y' lines for imported symbols
   --sys-path TEXT            Calculate imports relative to these on sys.path
-  --docstrings               Show function and class signatures plus docstrings
+  --docs, --docstrings       Show function and class signatures plus docstrings
   --count                    Show count of matching symbols
   --silent                   Silently ignore Python files with parse errors
   --async                    Filter async functions

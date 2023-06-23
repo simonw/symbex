@@ -64,6 +64,7 @@ from .lib import (
     help="Calculate imports relative to these on sys.path",
 )
 @click.option(
+    "--docs",
     "--docstrings",
     is_flag=True,
     help="Show function and class signatures plus docstrings",
@@ -140,7 +141,7 @@ def cli(
     no_file,
     imports,
     sys_paths,
-    docstrings,
+    docs,
     count,
     silent,
     async_,
@@ -205,7 +206,7 @@ def cli(
         silent = True
     if stdlib:
         directories = [*directories, *[pathlib.Path(pathlib.__file__).parent.resolve()]]
-    if count or docstrings:
+    if count or docs:
         signatures = True
     if imports and not symbols:
         signatures = True
@@ -344,9 +345,7 @@ def cli(
             else:
                 # else print absolute path
                 path = file.resolve()
-            snippet, line_no = code_for_node(
-                code, node, class_name, signatures, docstrings
-            )
+            snippet, line_no = code_for_node(code, node, class_name, signatures, docs)
             if not no_file:
                 bits = ["# File:", path]
                 if class_name:
