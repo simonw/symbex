@@ -127,7 +127,7 @@ In a fresh checkout of [Datasette](https://github.com/simonw/datasette) I ran th
 symbex MessagesDebugView get_long_description
 ```
 Here's the output of the command:
-```
+```python
 # File: setup.py Line: 5
 def get_long_description():
     with open(
