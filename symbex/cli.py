@@ -1,6 +1,9 @@
 import ast
 import click
+import importlib
+import inspect
 import pathlib
+import site
 
 from .lib import (
     code_for_node,
@@ -56,6 +59,9 @@ from .lib import (
     "--imports",
     is_flag=True,
     help="Show 'from x import y' lines for imported symbols",
+)
+@click.option(
+    "modules", "-m", "--module", multiple=True, help="Modules to search within"
 )
 @click.option(
     "sys_paths",
@@ -140,6 +146,7 @@ def cli(
     signatures,
     no_file,
     imports,
+    modules,
     sys_paths,
     docs,
     count,
@@ -200,12 +207,37 @@ def cli(
         # Count the number of --async functions in the project
         symbex --async --count
     """
+    if modules:
+        module_dirs = []
+        module_files = []
+        for module in modules:
+            try:
+                mod = importlib.import_module(module)
+                mod_path = pathlib.Path(inspect.getfile(mod))
+                if mod_path.stem == "__init__":
+                    module_dirs.append(mod_path.parent)
+                else:
+                    module_files.append(mod_path)
+            except ModuleNotFoundError as ex:
+                raise click.ClickException("Module not found: {}".format(module))
+        directories = [*directories, *module_dirs]
+        files = [*files, *module_files]
+        if module_dirs or module_files:
+            if not symbols:
+                symbols = ["*"]
+            site_packages_dirs = site.getsitepackages()
+            stdlib_dir = pathlib.Path(pathlib.__file__).parent
+            sys_paths = [*site_packages_dirs, str(stdlib_dir), *sys_paths]
+
     if no_init:
         fully_typed = True
     if stdlib and not directories and not files:
         silent = True
     if stdlib:
-        directories = [*directories, *[pathlib.Path(pathlib.__file__).parent.resolve()]]
+        stdlib_folder = pathlib.Path(pathlib.__file__).parent.resolve()
+        directories = [*directories, *[stdlib_folder]]
+        if str(stdlib_folder) not in sys_paths:
+            sys_paths = [*[str(stdlib_folder)], *sys_paths]
     if count or docs:
         signatures = True
     if imports and not symbols:
@@ -225,6 +257,7 @@ def cli(
             partially_typed,
             fully_typed,
             no_init,
+            modules,
         ]
     ):
         ctx = click.get_current_context()
@@ -245,6 +278,7 @@ def cli(
                 partially_typed,
                 fully_typed,
                 no_init,
+                modules,
             ]
         )
         and not symbols

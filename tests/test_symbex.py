@@ -164,6 +164,11 @@ def test_fixture(directory_full_of_code, monkeypatch, args, expected):
                 'def baz(delimiter=", ", type=str)'
             ),
         ),
+        # Test for the --module option
+        (
+            ["-m", "pathlib", "Path", "--silent", "-in"],
+            ("# from pathlib import Path\nclass Path(PurePath)"),
+        ),
     ),
 )
 def test_symbex_symbols(directory_full_of_code, monkeypatch, args, expected):

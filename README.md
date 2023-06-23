@@ -59,6 +59,10 @@ To search within a specific directory and all of its subdirectories, use the `-d
 ```bash
 symbex Database -d ~/projects/datasette
 ```
+If you know that you want to inspect one or more modules that can be imported by Python, you can use the `-m/--module name` option. This example shows the signatures for every symbol available in the `asyncio` package:
+```bash
+symbex -m asyncio -s --imports
+```
 You can search the directory containing the Python standard library using `--stdlib`. This can be useful for quickly looking up the source code for specific Python library functions:
 ```bash
 symbex --stdlib -in to_thread
@@ -354,6 +358,7 @@ Options:
   -s, --signatures           Show just function and class signatures
   -n, --no-file              Don't include the # File: comments in the output
   -i, --imports              Show 'from x import y' lines for imported symbols
+  -m, --module TEXT          Modules to search within
   --sys-path TEXT            Calculate imports relative to these on sys.path
   --docs, --docstrings       Show function and class signatures plus docstrings
   --count                    Show count of matching symbols
