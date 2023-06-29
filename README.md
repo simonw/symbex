@@ -298,6 +298,52 @@ And got back this:
 
 > This code defines a custom `Response` class with methods for returning HTTP responses. It includes methods for setting cookies, returning HTML, text, and JSON responses, and redirecting to a different URL. The `asgi_send` method sends the response to the client using the ASGI (Asynchronous Server Gateway Interface) protocol.
 
+## Replacing a matched symbol
+
+The `--replace` option can be used to replace a single matched symbol with content piped in to standard input.
+
+Given a file called `my_code.py` with the following content:
+```python
+def first_function():
+    # This will be ignored
+    pass
+
+def second_function():
+    # This will be replaced
+    pass
+```
+Run the following:
+```bash
+echo "def second_function(a, b):
+    # This is a replacement implementation
+    return a + b + 3
+" | symbex second_function --replace
+```
+The result will be an updated-in-place `my_code.py` containing the following:
+```python
+def first_function():
+    # This will be ignored
+    pass
+
+def second_function(a, b):
+    # This is a replacement implementation
+    return a + b + 3
+```
+This feature should be used with care! I recommend only using this feature against code that is already checked into Git, so you can review changes it makes using `git diff` and revert them using `git checkout my_code.py`.
+
+You can use this with `llm` like so:
+
+```bash
+symbex second_function -n \
+  | llm --system 'add type hints, remove docstring' \
+  | symbex second_function --replace
+```
+When I ran this the result was a `second_function` definition like this:
+```python
+def second_function(a: int, b: int) -> int:
+    return a + b + 3
+```
+
 ## Similar tools
 
 - [pyastgrep](https://github.com/spookylukey/pyastgrep) by Luke Plant offers advanced capabilities for viewing and searching through Python ASTs using XPath.
@@ -349,6 +395,12 @@ Usage: symbex [OPTIONS] [SYMBOLS]...
       # Count the number of --async functions in the project
       symbex --async --count
 
+      # Replace my_function with a new implementation:
+      echo "def my_function(a, b):
+          # This is a replacement implementation
+          return a + b + 3
+      " | symbex my_function --replace
+
 Options:
   --version                  Show the version and exit.
   -f, --file FILE            Files to search
@@ -373,6 +425,7 @@ Options:
   --partially-typed          Filter functions with partial type annotations
   --fully-typed              Filter functions with full type annotations
   --no-init                  Filter to exclude any __init__ methods
+  --replace                  Replace matching symbol with text from stdin
   --help                     Show this message and exit.
 
 ```

@@ -4,6 +4,7 @@ import importlib
 import inspect
 import pathlib
 import site
+import sys
 
 from .lib import (
     code_for_node,
@@ -137,6 +138,11 @@ from .lib import (
     is_flag=True,
     help="Filter to exclude any __init__ methods",
 )
+@click.option(
+    "--replace",
+    is_flag=True,
+    help="Replace matching symbol with text from stdin",
+)
 def cli(
     symbols,
     files,
@@ -161,6 +167,7 @@ def cli(
     partially_typed,
     fully_typed,
     no_init,
+    replace,
 ):
     """
     Find symbols in Python code and print the code for them.
@@ -206,6 +213,13 @@ def cli(
     \b
         # Count the number of --async functions in the project
         symbex --async --count
+
+    \b
+        # Replace my_function with a new implementation:
+        echo "def my_function(a, b):
+            # This is a replacement implementation
+            return a + b + 3
+        " | symbex my_function --replace
     """
     if modules:
         module_dirs = []
@@ -263,6 +277,11 @@ def cli(
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
         ctx.exit()
+
+    if replace and signatures:
+        raise click.ClickException("--replace cannot be used with --signatures")
+    if replace:
+        no_file = True
     # Default to '*' if --signatures or filters are provided without symbols
     if (
         any(
@@ -354,6 +373,7 @@ def cli(
 
     pwd = pathlib.Path(".").resolve()
     num_matches = 0
+    replace_matches = []
     for file in iterate_files():
         try:
             code = read_file(file)
@@ -380,6 +400,9 @@ def cli(
                 # else print absolute path
                 path = file.resolve()
             snippet, line_no = code_for_node(code, node, class_name, signatures, docs)
+            if replace:
+                replace_matches.append((file.resolve(), snippet, line_no))
+                continue
             if not no_file:
                 bits = ["# File:", path]
                 if class_name:
@@ -400,6 +423,28 @@ def cli(
             click.echo()
     if count:
         click.echo(num_matches)
+
+    if replace:
+        # Only works if we got a single match
+        if len(replace_matches) != 1:
+            raise click.ClickException(
+                "--replace only works with a single match, got {}".format(
+                    len(replace_matches)
+                )
+            )
+        filepath, to_replace = replace_matches[0][:2]
+        if sys.stdin.isatty():
+            raise click.ClickException(
+                "--replace only works with text piped to it on stdin"
+            )
+        new_lines = sys.stdin.readlines()
+        # Check if any lines were read
+        if len(new_lines) == 0:
+            raise click.ClickException("No input for --replace found on stdin")
+        replacement = "".join(new_lines)
+        old = filepath.read_text("utf-8")
+        new = old.replace(to_replace, replacement)
+        filepath.write_text(new, "utf-8")
 
 
 def is_subpath(path: pathlib.Path, parent: pathlib.Path) -> bool:

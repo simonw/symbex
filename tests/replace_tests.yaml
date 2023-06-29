@@ -1,0 +1,42 @@
+- original: |
+    def one():
+        pass
+
+    def two():
+        "Two"
+  stdin: |
+    def two(): pass
+  args: ["two", "--replace"]
+  expected: |
+    def one():
+        pass
+
+    def two(): pass
+
+- original: |
+    import os
+
+    @decorated
+    def one():
+        "This has multiple lines and a decorator"
+        return 1 + 2
+
+    def two():
+        "Two"
+  stdin: |
+    def one():
+        # No decorator now, but multiple lines
+        a = 1 + 2
+        return a * 3
+  args: ["one", "--replace"]
+  expected: |
+    import os
+
+    def one():
+        # No decorator now, but multiple lines
+        a = 1 + 2
+        return a * 3
+
+
+    def two():
+        "Two"
