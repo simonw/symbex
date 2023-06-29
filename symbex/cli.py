@@ -141,7 +141,7 @@ from .lib import (
 @click.option(
     "--replace",
     is_flag=True,
-    help="Replace a single matching symbol with text from stdin",
+    help="Replace matching symbol with text from stdin",
 )
 def cli(
     symbols,

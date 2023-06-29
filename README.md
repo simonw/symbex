@@ -419,6 +419,7 @@ Options:
   --partially-typed          Filter functions with partial type annotations
   --fully-typed              Filter functions with full type annotations
   --no-init                  Filter to exclude any __init__ methods
+  --replace                  Replace matching symbol with text from stdin
   --help                     Show this message and exit.
 
 ```
