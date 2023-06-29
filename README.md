@@ -426,6 +426,7 @@ Options:
   --fully-typed              Filter functions with full type annotations
   --no-init                  Filter to exclude any __init__ methods
   --replace                  Replace matching symbol with text from stdin
+  --rexec TEXT               Replace with the result of piping to this tool
   --help                     Show this message and exit.
 
 ```
