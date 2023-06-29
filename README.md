@@ -395,6 +395,12 @@ Usage: symbex [OPTIONS] [SYMBOLS]...
       # Count the number of --async functions in the project
       symbex --async --count
 
+      # Replace my_function with a new implementation:
+      echo "def my_function(a, b):
+          # This is a replacement implementation
+          return a + b + 3
+      " | symbex my_function --replace
+
 Options:
   --version                  Show the version and exit.
   -f, --file FILE            Files to search

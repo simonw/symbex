@@ -213,6 +213,13 @@ def cli(
     \b
         # Count the number of --async functions in the project
         symbex --async --count
+
+    \b
+        # Replace my_function with a new implementation:
+        echo "def my_function(a, b):
+            # This is a replacement implementation
+            return a + b + 3
+        " | symbex my_function --replace
     """
     if modules:
         module_dirs = []
