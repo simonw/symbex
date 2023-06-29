@@ -75,7 +75,8 @@ def add_docstring(definition: str, node: AST, docstrings: bool, is_method: bool)
     if not docstring:
         return definition
     docstring = quoted_string(docstring)
-    return f"{definition}\n{textwrap.indent(docstring, '        ' if is_method else '    ')}"
+    wrapped = textwrap.indent(docstring, "        " if is_method else "    ")
+    return f"{definition}\n{wrapped}"
 
 
 def match(name: str, symbols: Iterable[str]) -> bool:

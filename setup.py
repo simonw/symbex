@@ -32,6 +32,6 @@ setup(
         symbex=symbex.cli:cli
     """,
     install_requires=["click"],
-    extras_require={"test": ["pytest", "pytest-icdiff", "cogapp", "PyYAML"]},
+    extras_require={"test": ["pytest", "pytest-icdiff", "cogapp", "PyYAML", "ruff"]},
     python_requires=">=3.8",
 )

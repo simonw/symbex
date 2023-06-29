@@ -232,7 +232,7 @@ def cli(
                     module_dirs.append(mod_path.parent)
                 else:
                     module_files.append(mod_path)
-            except ModuleNotFoundError as ex:
+            except ModuleNotFoundError:
                 raise click.ClickException("Module not found: {}".format(module))
         directories = [*directories, *module_dirs]
         files = [*files, *module_files]
@@ -318,10 +318,6 @@ def cli(
                 if path.is_file():
                     yield path
 
-    # Filter symbols by type
-    def filter(node: ast.AST) -> bool:
-        return True
-
     # If any --filters were supplied, handle them:
     if any(
         [
@@ -337,7 +333,7 @@ def cli(
             no_init,
         ]
     ):
-
+        # Return just nodes matching filters
         def filter(node: ast.AST) -> bool:
             # Filters must ALL match
             if async_ and not isinstance(node, ast.AsyncFunctionDef):
@@ -369,6 +365,11 @@ def cli(
                 return False
             if fully_typed and not summary.fully:
                 return False
+            return True
+
+    else:
+        # All nodes are allowed
+        def filter(node: ast.AST) -> bool:
             return True
 
     pwd = pathlib.Path(".").resolve()

@@ -25,6 +25,9 @@ jobs:
     - name: Run tests
       run: |
         pytest
+    - name: Lint with ruff
+      run: |
+        ruff check symbex
     - name: Check if cog needs to be run
       run: |
         cog README.md

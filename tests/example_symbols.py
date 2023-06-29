@@ -1,4 +1,4 @@
-from typing import Union, Tuple
+from typing import Tuple
 
 
 # Function with no arguments
