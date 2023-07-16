@@ -4,6 +4,7 @@ import importlib
 import inspect
 import pathlib
 import site
+import subprocess
 import sys
 
 from .lib import (
@@ -146,6 +147,7 @@ from .lib import (
     is_flag=True,
     help="Replace matching symbol with text from stdin",
 )
+@click.option("--rexec", help="Replace with the result of piping to this tool")
 def cli(
     symbols,
     files,
@@ -172,6 +174,7 @@ def cli(
     no_init,
     check,
     replace,
+    rexec,
 ):
     """
     Find symbols in Python code and print the code for them.
@@ -281,6 +284,10 @@ def cli(
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
         ctx.exit()
+
+    if rexec:
+        replace = True
+        no_file = True
 
     if replace and signatures:
         raise click.ClickException("--replace cannot be used with --signatures")
@@ -442,15 +449,33 @@ def cli(
                 )
             )
         filepath, to_replace = replace_matches[0][:2]
-        if sys.stdin.isatty():
-            raise click.ClickException(
-                "--replace only works with text piped to it on stdin"
+        if rexec:
+            # Run to_replace through that command
+            p = subprocess.Popen(
+                rexec,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=True,
             )
-        new_lines = sys.stdin.readlines()
-        # Check if any lines were read
-        if len(new_lines) == 0:
-            raise click.ClickException("No input for --replace found on stdin")
-        replacement = "".join(new_lines)
+            stdout, stderr = p.communicate(input=to_replace.encode())
+            if p.returncode != 0:
+                raise click.ClickException(
+                    f"Command '{rexec}' failed with exit code {p.returncode}"
+                    f", stderr: {stderr.decode()}"
+                )
+
+            replacement = stdout.decode()
+        else:
+            if sys.stdin.isatty():
+                raise click.ClickException(
+                    "--replace only works with text piped to it on stdin"
+                )
+            new_lines = sys.stdin.readlines()
+            # Check if any lines were read
+            if len(new_lines) == 0:
+                raise click.ClickException("No input for --replace found on stdin")
+            replacement = "".join(new_lines)
         old = filepath.read_text("utf-8")
         new = old.replace(to_replace, replacement)
         filepath.write_text(new, "utf-8")
