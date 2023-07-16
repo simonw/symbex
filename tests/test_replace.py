@@ -108,3 +108,23 @@ def test_replace_rexec():
         modified = path.read_text("utf-8")
     assert result.exit_code == 0
     assert modified.strip() == REXEC_EXPECTED.strip()
+
+
+def test_replace_rexec_error():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as root:
+        path = pathlib.Path(root) / "code.py"
+        path.write_text(INPUT_CODE, "utf-8")
+        to_upper = pathlib.Path(root) / "to_upper.py"
+        to_upper.write_text("exit(1)", "utf-8")
+        long_command = " ".join(
+            [
+                sys.executable,
+                str(to_upper),
+            ]
+        )
+        args = ["foo", "--rexec", long_command]
+        result = runner.invoke(cli, args, catch_exceptions=False)
+        not_modified = path.read_text("utf-8")
+    assert result.exit_code == 1
+    assert not_modified.strip() == INPUT_CODE.strip()
