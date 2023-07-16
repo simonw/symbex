@@ -343,7 +343,12 @@ Here's an example that uses `sed` to add a `# ` to the beginning of each matchin
 ```bash
 symbex first_function --rexec "sed 's/^/# /'"
 ```
-
+This modified the first function in place to look like this:
+```python
+# def first_function():
+#    # This will be ignored
+#    pass
+```
 A much more exciting example uses LLM. This example will use the `gpt-3.5-turbo` model to add type hints and generate a docstring:
 
 ```bash
@@ -359,7 +364,7 @@ def first_function():
 def second_function(a, b):
     return a + b + 3
 ```
-And the code for that second function was updated in place to look like this:
+And the second function was updated in place to look like this:
 ```python
 def second_function(a: int, b: int) -> int:
     """
