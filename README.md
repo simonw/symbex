@@ -97,6 +97,7 @@ The following filters are available:
 - `--function` - only functions
 - `--class` - only classes
 - `--async` - only `async def` functions
+- `--unasync` - only non-async functions
 - `--documented` - functions/classes that have a docstring
 - `--undocumented` - functions/classes that do not have a docstring
 - `--typed` - functions that have at least one type annotation
@@ -463,8 +464,9 @@ Options:
   --docs, --docstrings       Show function and class signatures plus docstrings
   --count                    Show count of matching symbols
   --silent                   Silently ignore Python files with parse errors
-  --async                    Filter async functions
   --function                 Filter functions
+  --async                    Filter async functions
+  --unasync                  Filter non-async functions
   --class                    Filter classes
   --documented               Filter functions with docstrings
   --undocumented             Filter functions without docstrings

@@ -88,15 +88,21 @@ from .lib import (
     help="Silently ignore Python files with parse errors",
 )
 @click.option(
+    "--function",
+    is_flag=True,
+    help="Filter functions",
+)
+@click.option(
     "async_",
     "--async",
     is_flag=True,
     help="Filter async functions",
 )
 @click.option(
-    "--function",
+    "unasync",
+    "--unasync",
     is_flag=True,
-    help="Filter functions",
+    help="Filter non-async functions",
 )
 @click.option(
     "class_",
@@ -162,8 +168,9 @@ def cli(
     docs,
     count,
     silent,
-    async_,
     function,
+    async_,
+    unasync,
     class_,
     documented,
     undocumented,
@@ -269,6 +276,7 @@ def cli(
             symbols,
             signatures,
             async_,
+            unasync,
             function,
             class_,
             documented,
@@ -299,6 +307,7 @@ def cli(
             [
                 signatures,
                 async_,
+                unasync,
                 function,
                 class_,
                 documented,
@@ -333,6 +342,7 @@ def cli(
     if any(
         [
             async_,
+            unasync,
             function,
             class_,
             documented,
@@ -352,6 +362,8 @@ def cli(
             if function and not isinstance(
                 node, (ast.FunctionDef, ast.AsyncFunctionDef)
             ):
+                return False
+            if unasync and not isinstance(node, ast.FunctionDef):
                 return False
             if class_ and not isinstance(node, ast.ClassDef):
                 return False

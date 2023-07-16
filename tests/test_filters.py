@@ -50,6 +50,27 @@ from symbex.cli import cli
                 "async def async_func_fully_typed",
             ],
         ),
+        (
+            ["--unasync"],
+            [
+                "def func_no_args",
+                "def func_positional_args",
+                "def func_default_args",
+                "def func_arbitrary_positional_args",
+                "def func_arbitrary_keyword_args",
+                "def func_arbitrary_args",
+                "def func_positional_only_args",
+                "def func_keyword_only_args",
+                "def func_type_annotations",
+                "def function_with_non_pep_0484_annotation",
+                "def complex_annotations",
+                "def func_fully_typed",
+                "def func_partially_typed",
+                "def func_partially_typed_no_typed_return",
+                "def func_partially_typed_only_typed_return",
+                "def func_typed_no_params",
+            ],
+        ),
         # This doesn't make sense, so should return []
         (
             ["--async", "--class"],
