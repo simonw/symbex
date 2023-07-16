@@ -450,6 +450,10 @@ Usage: symbex [OPTIONS] [SYMBOLS]...
           return a + b + 3
       " | symbex my_function --replace
 
+      # Replace my_function with the output of a command:
+      symbex first_function --rexec "sed 's/^/# /'"
+      # This uses sed to comment out the function body
+
 Options:
   --version                  Show the version and exit.
   -f, --file FILE            Files to search
