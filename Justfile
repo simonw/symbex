@@ -17,3 +17,6 @@
 # Apply Black
 @black:
   pipenv run black .
+
+# Auto-format and fix things
+@fix: cog black
