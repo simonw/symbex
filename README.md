@@ -320,6 +320,7 @@ echo "def second_function(a, b):
 " | symbex second_function --replace
 ```
 The result will be an updated-in-place `my_code.py` containing the following:
+
 ```python
 def first_function():
     # This will be ignored
@@ -331,18 +332,49 @@ def second_function(a, b):
 ```
 This feature should be used with care! I recommend only using this feature against code that is already checked into Git, so you can review changes it makes using `git diff` and revert them using `git checkout my_code.py`.
 
-You can use this with `llm` like so:
+## Replacing a matched symbol by running a command
+
+The `--rexec COMMAND` option can be used to replace a single matched symbol by running a command and using its output.
+
+The command will be run with the matched symbol's definition piped to its standard input. The output of that command will be used as the replacement text.
+
+Here's an example that uses `sed` to add a `# ` to the beginning of each matching line, effectively commenting out the matched function:
 
 ```bash
-symbex second_function -n \
-  | llm --system 'add type hints, remove docstring' \
-  | symbex second_function --replace
+symbex first_function --rexec "sed 's/^/# /'"
 ```
-When I ran this the result was a `second_function` definition like this:
+
+A much more exciting example uses LLM. This example will use the `gpt-3.5-turbo` model to add type hints and generate a docstring:
+
+```bash
+symbex second_function \
+  --rexec "llm --system 'add type hints and a docstring'"
+```
+I ran this against this code:
 ```python
-def second_function(a: int, b: int) -> int:
+def first_function():
+    # This will be ignored
+    pass
+
+def second_function(a, b):
     return a + b + 3
 ```
+And the code for that second function was updated in place to look like this:
+```python
+def second_function(a: int, b: int) -> int:
+    """
+    Returns the sum of two integers (a and b) plus 3.
+
+    Parameters:
+    a (int): The first integer.
+    b (int): The second integer.
+
+    Returns:
+    int: The sum of a and b plus 3.
+    """
+    return a + b + 3
+```
+
 ## Using in CI
 
 The `--check` option causes `symbex` to return a non-zero exit code if any matches are found for your query.
