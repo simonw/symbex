@@ -210,3 +210,14 @@ def test_filters(args, expected):
     )
     assert result2.exit_code == 0
     assert result2.stdout.strip() == str(expected_count)
+
+    # And the --check option
+    result3 = runner.invoke(
+        cli,
+        full_args + ["--check"],
+        catch_exceptions=False,
+    )
+    if expected:
+        assert result3.exit_code == 1
+    else:
+        assert result3.exit_code == 0

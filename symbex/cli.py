@@ -139,6 +139,9 @@ from .lib import (
     help="Filter to exclude any __init__ methods",
 )
 @click.option(
+    "--check", is_flag=True, help="Exit with non-zero code if any matches found"
+)
+@click.option(
     "--replace",
     is_flag=True,
     help="Replace matching symbol with text from stdin",
@@ -167,6 +170,7 @@ def cli(
     partially_typed,
     fully_typed,
     no_init,
+    check,
     replace,
 ):
     """
@@ -391,9 +395,10 @@ def cli(
         for node, class_name in nodes:
             if not filter(node):
                 continue
-            if count:
+            if count or check:
                 num_matches += 1
-                continue
+                if count or not signatures:
+                    continue
             # If file is within pwd, print relative path
             if pwd in file.resolve().parents:
                 path = file.resolve().relative_to(pwd)
@@ -424,6 +429,9 @@ def cli(
             click.echo()
     if count:
         click.echo(num_matches)
+
+    if check and num_matches > 0:
+        sys.exit(1)
 
     if replace:
         # Only works if we got a single match

@@ -343,6 +343,16 @@ When I ran this the result was a `second_function` definition like this:
 def second_function(a: int, b: int) -> int:
     return a + b + 3
 ```
+## Using in CI
+
+The `--check` option causes `symbex` to return a non-zero exit code if any matches are found for your query.
+
+You can use this in CI to guard against things like functions being added without documentation:
+
+```bash
+symbex --function --undocumented --check
+```
+This will fail silently but set a `1` exit code if there are any undocumented functions.
 
 ## Similar tools
 
@@ -425,6 +435,7 @@ Options:
   --partially-typed          Filter functions with partial type annotations
   --fully-typed              Filter functions with full type annotations
   --no-init                  Filter to exclude any __init__ methods
+  --check                    Exit with non-zero code if any matches found
   --replace                  Replace matching symbol with text from stdin
   --help                     Show this message and exit.
 
