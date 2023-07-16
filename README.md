@@ -390,6 +390,8 @@ symbex --function --undocumented --check
 ```
 This will fail silently but set a `1` exit code if there are any undocumented functions.
 
+`--check` will not output anything by default. Add `--count` to output a count of matching symbols, or `-s/--signatures` to output the signatures of the matching symbols.
+
 ## Similar tools
 
 - [pyastgrep](https://github.com/spookylukey/pyastgrep) by Luke Plant offers advanced capabilities for viewing and searching through Python ASTs using XPath.
