@@ -390,17 +390,6 @@ symbex --function --undocumented --check
 ```
 This will fail silently but set a `1` exit code if there are any undocumented functions.
 
-## Using in CI
-
-The `--check` option causes `symbex` to return a non-zero exit code if any matches are found for your query.
-
-You can use this in CI to guard against things like functions being added without documentation:
-
-```bash
-symbex --function --undocumented --check
-```
-This will fail silently but set a `1` exit code if there are any undocumented functions.
-
 ## Similar tools
 
 - [pyastgrep](https://github.com/spookylukey/pyastgrep) by Luke Plant offers advanced capabilities for viewing and searching through Python ASTs using XPath.
