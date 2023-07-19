@@ -100,6 +100,9 @@ The following filters are available:
 - `--unasync` - only non-async functions
 - `--documented` - functions/classes that have a docstring
 - `--undocumented` - functions/classes that do not have a docstring
+- `--public` - functions/classes that are public - don't have a `_name` prefix (or are `__*__` methods)
+- `--private` - functions/classes that are private - have a `_name` prefix and are not `__*__`
+- `--dunder` - functions matching `__*__` - this should usually be used with `*.*` to find all dunder methods
 - `--typed` - functions that have at least one type annotation
 - `--untyped` - functions that have no type annotations
 - `--partially-typed` - functions that have some type annotations but not all
@@ -118,6 +121,12 @@ This example shows the full source code of every class method in the Python stan
 
 ```bash
 symbex --fully-typed --no-init '*.*' --stdlib
+```
+
+To find all public functions and methods that lack documentation, just showing the signature of each one:
+
+```bash
+symbex '*' '*.*' --public --undocumented --signatures
 ```
 
 ### Example output
@@ -384,14 +393,24 @@ def second_function(a: int, b: int) -> int:
 
 The `--check` option causes `symbex` to return a non-zero exit code if any matches are found for your query.
 
-You can use this in CI to guard against things like functions being added without documentation:
+You can use this in CI to guard against things like public functions being added without documentation:
 
 ```bash
-symbex --function --undocumented --check
+symbex --function --public --undocumented --check
 ```
 This will fail silently but set a `1` exit code if there are any undocumented functions.
 
-`--check` will not output anything by default. Add `--count` to output a count of matching symbols, or `-s/--signatures` to output the signatures of the matching symbols.
+Using this as a step in a CI tool such as GitHub Actions should result in a test failure.
+
+Run this to see the exit code from the last command:
+```bash
+echo $?
+```
+
+`--check` will not output anything by default. Add `--count` to output a count of matching symbols, or `-s/--signatures` to output the signatures of the matching symbols, for example:
+```bash
+symbex --function --public --undocumented --check --count
+```
 
 ## Similar tools
 
@@ -474,6 +493,9 @@ Options:
   --class                    Filter classes
   --documented               Filter functions with docstrings
   --undocumented             Filter functions without docstrings
+  --public                   Filter for symbols without a _ prefix
+  --private                  Filter for symbols with a _ prefix
+  --dunder                   Filter for symbols matching __*__
   --typed                    Filter functions with type annotations
   --untyped                  Filter functions without type annotations
   --partially-typed          Filter functions with partial type annotations

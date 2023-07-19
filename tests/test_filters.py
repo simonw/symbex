@@ -30,6 +30,7 @@ from symbex.cli import cli
                 "def func_partially_typed_no_typed_return",
                 "def func_partially_typed_only_typed_return",
                 "def func_typed_no_params",
+                "def _private",
             ],
         ),
         (
@@ -41,6 +42,7 @@ from symbex.cli import cli
                 "class ClassWithMeta",
                 "class ClassWithMethods",
                 "class ClassForTypedTests",
+                "class _PrivateClass",
             ],
         ),
         (
@@ -69,6 +71,7 @@ from symbex.cli import cli
                 "def func_partially_typed_no_typed_return",
                 "def func_partially_typed_only_typed_return",
                 "def func_typed_no_params",
+                "def _private",
             ],
         ),
         # This doesn't make sense, so should return []
@@ -89,6 +92,7 @@ from symbex.cli import cli
                 "def func_partially_typed_no_typed_return",
                 "def func_partially_typed_only_typed_return",
                 "def func_typed_no_params",
+                "def _private",
             ],
         ),
         (
@@ -128,6 +132,7 @@ from symbex.cli import cli
                 "def func_fully_typed",
                 "async def async_func_fully_typed",
                 "def func_typed_no_params",
+                "def _private",
             ],
         ),
         # Test against methods
@@ -148,6 +153,7 @@ from symbex.cli import cli
                 "def method_keyword_only_args",
                 "async def async_method",
                 "def method_untyped",
+                "def _private_method",
             ],
         ),
         (
@@ -197,6 +203,70 @@ from symbex.cli import cli
                 "def method_untyped",
             ],
         ),
+        # Private and public and dunder
+        (
+            ["--public"],
+            [
+                "def func_no_args",
+                "def func_positional_args",
+                "async def async_func",
+                "def func_default_args",
+                "def func_arbitrary_positional_args",
+                "def func_arbitrary_keyword_args",
+                "def func_arbitrary_args",
+                "def func_positional_only_args",
+                "def func_keyword_only_args",
+                "def func_type_annotations",
+                "class ClassNoBase",
+                "class ClassSingleBase",
+                "class ClassMultipleBase",
+                "class ClassWithMeta",
+                "class ClassWithMethods",
+                "def function_with_non_pep_0484_annotation",
+                "def complex_annotations",
+                "def func_fully_typed",
+                "async def async_func_fully_typed",
+                "def func_partially_typed",
+                "def func_partially_typed_no_typed_return",
+                "def func_partially_typed_only_typed_return",
+                "def func_typed_no_params",
+                "class ClassForTypedTests",
+            ],
+        ),
+        (
+            ["--public", "*.*"],
+            [
+                "def __init__",
+                "def method_types",
+                "def method_positional_only_args",
+                "def method_keyword_only_args",
+                "async def async_method",
+                "def __init__",
+                "def method_fully_typed",
+                "def method_partially_typed",
+                "def method_untyped",
+            ],
+        ),
+        (["--private", "*.*"], ["def _private_method"]),
+        (
+            ["--public", "--class"],
+            [
+                "class ClassNoBase",
+                "class ClassSingleBase",
+                "class ClassMultipleBase",
+                "class ClassWithMeta",
+                "class ClassWithMethods",
+                "class ClassForTypedTests",
+            ],
+        ),
+        (
+            ["--private", "--class"],
+            [
+                "class _PrivateClass",
+            ],
+        ),
+        (["--private"], ["def _private", "class _PrivateClass"]),
+        (["--dunder", "*.*"], ["def __init__", "def __init__"]),
     ),
 )
 def test_filters(args, expected):

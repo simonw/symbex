@@ -137,6 +137,10 @@ def func_typed_no_params() -> None:
     pass
 
 
+def _private() -> None:
+    pass
+
+
 class ClassForTypedTests:
     def __init__(self, a: int):
         pass
@@ -152,3 +156,10 @@ class ClassForTypedTests:
 
     def method_untyped(self, a, b):
         pass
+
+    def _private_method(self):
+        pass
+
+
+class _PrivateClass:
+    pass

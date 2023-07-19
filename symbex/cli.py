@@ -121,6 +121,21 @@ from .lib import (
     help="Filter functions without docstrings",
 )
 @click.option(
+    "--public",
+    is_flag=True,
+    help="Filter for symbols without a _ prefix",
+)
+@click.option(
+    "--private",
+    is_flag=True,
+    help="Filter for symbols with a _ prefix",
+)
+@click.option(
+    "--dunder",
+    is_flag=True,
+    help="Filter for symbols matching __*__",
+)
+@click.option(
     "--typed",
     is_flag=True,
     help="Filter functions with type annotations",
@@ -174,6 +189,9 @@ def cli(
     class_,
     documented,
     undocumented,
+    public,
+    private,
+    dunder,
     typed,
     untyped,
     partially_typed,
@@ -286,6 +304,9 @@ def cli(
             class_,
             documented,
             undocumented,
+            public,
+            private,
+            dunder,
             typed,
             untyped,
             partially_typed,
@@ -317,6 +338,9 @@ def cli(
                 class_,
                 documented,
                 undocumented,
+                public,
+                private,
+                dunder,
                 typed,
                 untyped,
                 partially_typed,
@@ -352,6 +376,9 @@ def cli(
             class_,
             documented,
             undocumented,
+            public,
+            private,
+            dunder,
             typed,
             untyped,
             partially_typed,
@@ -375,6 +402,12 @@ def cli(
             if documented and not ast.get_docstring(node):
                 return False
             if undocumented and ast.get_docstring(node):
+                return False
+            if public and node.name.startswith("_") and not is_dunder(node.name):
+                return False
+            if private and (is_dunder(node.name) or not node.name.startswith("_")):
+                return False
+            if dunder and not is_dunder(node.name):
                 return False
             summary = type_summary(node)
             # if no summary, type filters all fail
@@ -504,3 +537,7 @@ def is_subpath(path: pathlib.Path, parent: pathlib.Path) -> bool:
         return True
     except ValueError:
         return False
+
+
+def is_dunder(name):
+    return name.startswith("__") and name.endswith("__")
