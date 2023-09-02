@@ -69,7 +69,7 @@ def test_method_symbols():
     assert result.exit_code == 0
     assert result.stdout == (
         "# File: tests/example_symbols.py Class: ClassWithMethods Line: 91\n"
-        "    async def async_method(a, b, c)\n"
+        "    async def async_method(a, b, c):\n"
         "\n"
     )
 
@@ -88,20 +88,20 @@ def test_docstrings():
     assert result.exit_code == 0
     expected = """
 # File: tests/example_symbols.py Line: X
-def func_no_args()
+def func_no_args():
     "This has a single line docstring"
 
 # File: tests/example_symbols.py Line: X
-def func_positional_args(a, b, c)
+def func_positional_args(a, b, c):
     \"\"\"This has a
     multi-line docstring\"\"\"
 
 # File: tests/example_symbols.py Class: ClassForTypedTests Line: X
-    def method_fully_typed(self, a: int, b: str) -> bool
+    def method_fully_typed(self, a: int, b: str) -> bool:
         "Single line"
 
 # File: tests/example_symbols.py Class: ClassForTypedTests Line: X
-    def method_partially_typed(self, a: int, b) -> bool
+    def method_partially_typed(self, a: int, b) -> bool:
         \"\"\"Multiple
         lines\"\"\"
     """.strip()
@@ -126,15 +126,15 @@ def test_imports(no_file):
     expected = """
 # File: tests/example_symbols.py Line: 28
 # from example_symbols import func_arbitrary_positional_args
-def func_arbitrary_positional_args(*args)
+def func_arbitrary_positional_args(*args):
 
 # File: tests/example_symbols.py Line: 33
 # from example_symbols import func_arbitrary_keyword_args
-def func_arbitrary_keyword_args(**kwargs)
+def func_arbitrary_keyword_args(**kwargs):
 
 # File: tests/example_symbols.py Line: 38
 # from example_symbols import func_arbitrary_args
-def func_arbitrary_args(*args, **kwargs)
+def func_arbitrary_args(*args, **kwargs):
     """.strip()
     if no_file:
         lines = expected.split("\n")

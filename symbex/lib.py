@@ -169,7 +169,7 @@ def function_definition(function_node: AST):
     if isinstance(function_node, AsyncFunctionDef):
         def_ = "async def "
 
-    return f"{def_}{function_name}({arguments_str}){return_annotation}"
+    return f"{def_}{function_name}({arguments_str}){return_annotation}:"
 
 
 def class_definition(class_def):
@@ -201,7 +201,7 @@ def class_definition(class_def):
     if signature:
         signature = f"({signature})"
 
-    class_definition = f"class {class_def.name}{signature}"
+    class_definition = f"class {class_def.name}{signature}:"
 
     return class_definition
 

@@ -184,40 +184,40 @@ cog.out(
 ]]] -->
 ```python
 # File: symbex/lib.py Line: 107
-def function_definition(function_node: AST)
+def function_definition(function_node: AST):
 
 # File: symbex/lib.py Line: 13
-def find_symbol_nodes(code: str, filename: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]
+def find_symbol_nodes(code: str, filename: str, symbols: Iterable[str]) -> List[Tuple[(AST, Optional[str])]]:
 
 # File: symbex/lib.py Line: 175
-def class_definition(class_def)
+def class_definition(class_def):
 
 # File: symbex/lib.py Line: 209
-def annotation_definition(annotation: AST) -> str
+def annotation_definition(annotation: AST) -> str:
 
 # File: symbex/lib.py Line: 227
-def read_file(path)
+def read_file(path):
 
 # File: symbex/lib.py Line: 253
-class TypeSummary
+class TypeSummary:
 
 # File: symbex/lib.py Line: 258
-def type_summary(node: AST) -> Optional[TypeSummary]
+def type_summary(node: AST) -> Optional[TypeSummary]:
 
 # File: symbex/lib.py Line: 304
-def quoted_string(s)
+def quoted_string(s):
 
 # File: symbex/lib.py Line: 315
-def import_line_for_function(function_name: str, filepath: str, possible_root_dirs: List[str]) -> str
+def import_line_for_function(function_name: str, filepath: str, possible_root_dirs: List[str]) -> str:
 
 # File: symbex/lib.py Line: 37
-def code_for_node(code: str, node: AST, class_name: str, signatures: bool, docstrings: bool) -> Tuple[(str, int)]
+def code_for_node(code: str, node: AST, class_name: str, signatures: bool, docstrings: bool) -> Tuple[(str, int)]:
 
 # File: symbex/lib.py Line: 71
-def add_docstring(definition: str, node: AST, docstrings: bool, is_method: bool) -> str
+def add_docstring(definition: str, node: AST, docstrings: bool, is_method: bool) -> str:
 
 # File: symbex/lib.py Line: 82
-def match(name: str, symbols: Iterable[str]) -> bool
+def match(name: str, symbols: Iterable[str]) -> bool:
 ```
 <!-- [[[end]]] -->
 This can be combined with other options, or you can run `symbex -s` to see every symbol in the current directory and its subdirectories.
@@ -239,7 +239,7 @@ cog.out(
 ```python
 # File: symbex/lib.py Line: 82
 # from symbex.lib import match
-def match(name: str, symbols: Iterable[str]) -> bool
+def match(name: str, symbols: Iterable[str]) -> bool:
 ```
 <!-- [[[end]]] -->
 To suppress the `# File: ...` comments, use `--no-file` or `-n`.
@@ -259,7 +259,7 @@ cog.out(
 ]]] -->
 ```python
 # from symbex.lib import match
-def match(name: str, symbols: Iterable[str]) -> bool
+def match(name: str, symbols: Iterable[str]) -> bool:
 ```
 <!-- [[[end]]] -->
 
@@ -276,7 +276,7 @@ cog.out(
 ]]] -->
 ```python
 # File: symbex/lib.py Line: 82
-def match(name: str, symbols: Iterable[str]) -> bool
+def match(name: str, symbols: Iterable[str]) -> bool:
     "Returns True if name matches any of the symbols, resolving wildcards"
 ```
 <!-- [[[end]]] -->

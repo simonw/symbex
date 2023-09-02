@@ -151,23 +151,23 @@ def test_fixture(directory_full_of_code, monkeypatch, args, expected):
         (
             ["foo*", "--silent"],
             "# File: foo.py Line: 1\n"
-            "def foo1()\n"
+            "def foo1():\n"
             "\n"
             "# File: foo.py Line: 5\n"
-            "def foo2()",
+            "def foo2():",
         ),
-        (["BarClass", "--silent"], "# File: bar.py Line: 1\n" "class BarClass"),
+        (["BarClass", "--silent"], "# File: bar.py Line: 1\n" "class BarClass:"),
         (
             ["baz", "--silent"],
             (
                 "# File: nested.py/x/baz.py Line: 1\n"
-                'def baz(delimiter=", ", type=str)'
+                'def baz(delimiter=", ", type=str):'
             ),
         ),
         # Test for the --module option
         (
             ["-m", "pathlib", "Path", "--silent", "-in"],
-            ("# from pathlib import Path\nclass Path(PurePath)"),
+            ("# from pathlib import Path\nclass Path(PurePath):"),
         ),
     ),
 )

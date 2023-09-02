@@ -288,8 +288,8 @@ def test_filters(args, expected):
         for line in result.stdout.splitlines()
         if line.strip() and not line.startswith("# File:")
     ]
-    # We only match up to the opening "("
-    defs = [line.split("(")[0] for line in lines]
+    # We only match up to the opening "(" or ":"
+    defs = [line.split("(")[0].split(":")[0] for line in lines]
     assert defs == expected
 
     # Test the --count option too
