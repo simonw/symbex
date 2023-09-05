@@ -1,4 +1,4 @@
-# symbex
+# Symbex
 
 [![PyPI](https://img.shields.io/pypi/v/symbex.svg)](https://pypi.org/project/symbex/)
 [![Changelog](https://img.shields.io/github/v/release/simonw/symbex?include_prereleases&label=changelog)](https://github.com/simonw/symbex/releases)
@@ -7,7 +7,7 @@
 
 Find the Python code for specified symbols
 
-Read [symbex: search Python code for functions and classes, then pipe them into a LLM](https://simonwillison.net/2023/Jun/18/symbex/) for background on this project.
+Read [Symbex: search Python code for functions and classes, then pipe them into a LLM](https://simonwillison.net/2023/Jun/18/symbex/) for background on this project.
 
 ## Installation
 
