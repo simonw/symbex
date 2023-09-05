@@ -344,6 +344,20 @@ And got back this:
 
 > This code defines a custom `Response` class with methods for returning HTTP responses. It includes methods for setting cookies, returning HTML, text, and JSON responses, and redirecting to a different URL. The `asgi_send` method sends the response to the client using the ASGI (Asynchronous Server Gateway Interface) protocol.
 
+The structured output feature is designed to be used with [LLM embeddings](https://llm.datasette.io/en/stable/embeddings/index.html). You can generate embeddings for every symbol in your codebase using [llm embed-multi](https://llm.datasette.io/en/stable/embeddings/cli.html#llm-embed-multi) like this:
+
+```bash
+symbex '*' '*:*' --nl | \
+  llm embed-multi symbols - \
+  --format nl --database embeddings.db --store
+```
+This creates a database in `embeddings.db` containing all of your symbols along with embedding vectors.
+
+You can then search your code like this:
+```bash
+llm similar symbols -d embeddings.db -c 'test csv' | jq
+```
+
 ## Replacing a matched symbol
 
 The `--replace` option can be used to replace a single matched symbol with content piped in to standard input.
