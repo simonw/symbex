@@ -1,11 +1,15 @@
 import ast
 import click
+import csv
+import dataclasses
 import importlib
 import inspect
+import json
 import pathlib
 import site
 import subprocess
 import sys
+from typing import TextIO, Iterable, Literal, Tuple
 
 from .lib import (
     code_for_node,
@@ -14,6 +18,14 @@ from .lib import (
     read_file,
     type_summary,
 )
+
+
+@dataclasses.dataclass
+class Output:
+    symbol_id: str
+    output_identifier_line: str
+    output_import_line: str
+    snippet: str
 
 
 @click.command()
@@ -169,6 +181,12 @@ from .lib import (
     help="Replace matching symbol with text from stdin",
 )
 @click.option("--rexec", help="Replace with the result of piping to this tool")
+# Output options
+@click.option("csv_", "--csv", is_flag=True, help="Output as CSV")
+@click.option("--tsv", is_flag=True, help="Output as TSV")
+@click.option("json_", "--json", is_flag=True, help="Output as JSON")
+@click.option("--nl", is_flag=True, help="Output as newline-delimited JSON")
+@click.option("--id-prefix", help="Prefix to use for symbol IDs")
 def cli(
     symbols,
     files,
@@ -200,6 +218,11 @@ def cli(
     check,
     replace,
     rexec,
+    csv_,
+    tsv,
+    json_,
+    nl,
+    id_prefix,
 ):
     """
     Find symbols in Python code and print the code for them.
@@ -258,6 +281,17 @@ def cli(
         symbex first_function --rexec "sed 's/^/# /'"
         # This uses sed to comment out the function body
     """
+    # Only one of --json, --csv, --tsv, --nl
+    output_formats = [csv_, tsv, json_, nl]
+    if sum(output_formats) > 1:
+        raise click.ClickException("Only one of --csv, --tsv, --json, --nl can be used")
+    if id_prefix and not sum(output_formats):
+        raise click.ClickException(
+            "--id-prefix can only be used with --csv, --tsv, --json or --nl"
+        )
+    if id_prefix is None:
+        id_prefix = ""
+
     if modules:
         module_dirs = []
         module_files = []
@@ -436,54 +470,90 @@ def cli(
     pwd = pathlib.Path(".").resolve()
     num_matches = 0
     replace_matches = []
-    for file in iterate_files():
-        try:
-            code = read_file(file)
-        except UnicodeDecodeError as ex:
-            if not silent:
-                click.secho(f"# Unicode error in {file}: {ex}", err=True, fg="yellow")
-            continue
-        try:
-            nodes = find_symbol_nodes(code, str(file), symbols)
-        except SyntaxError as ex:
-            if not silent:
-                click.secho(f"# Syntax error in {file}: {ex}", err=True, fg="yellow")
-            continue
-        for node, class_name in nodes:
-            if not filter(node):
-                continue
-            if count or check:
-                num_matches += 1
-                if count or not signatures:
-                    continue
-            # If file is within pwd, print relative path
-            if pwd in file.resolve().parents:
-                path = file.resolve().relative_to(pwd)
-            else:
-                # else print absolute path
-                path = file.resolve()
-            snippet, line_no = code_for_node(code, node, class_name, signatures, docs)
-            if replace:
-                replace_matches.append((file.resolve(), snippet, line_no))
-                continue
-            if not no_file:
-                bits = ["# File:", path]
-                if class_name:
-                    bits.extend(["Class:", class_name])
-                bits.extend(["Line:", line_no])
-                click.echo(" ".join(str(bit) for bit in bits))
-            if imports:
-                import_line = import_line_for_function(
-                    node.name, path, sys_paths or directories
-                )
-                # If it's a class then output '# from x import Class' instead
-                if class_name:
-                    import_line = (
-                        import_line.split(" import ")[0] + " import " + class_name
+
+    def stuff_to_output():
+        nonlocal num_matches
+        for file in iterate_files():
+            try:
+                code = read_file(file)
+            except UnicodeDecodeError as ex:
+                if not silent:
+                    click.secho(
+                        f"# Unicode error in {file}: {ex}", err=True, fg="yellow"
                     )
-                click.echo("# " + import_line)
-            click.echo(snippet)
+                continue
+            try:
+                nodes = find_symbol_nodes(code, str(file), symbols)
+            except SyntaxError as ex:
+                if not silent:
+                    click.secho(
+                        f"# Syntax error in {file}: {ex}", err=True, fg="yellow"
+                    )
+                continue
+            for node, class_name in nodes:
+                if not filter(node):
+                    continue
+                if count or check:
+                    num_matches += 1
+                    if count or not signatures:
+                        continue
+                # If file is within pwd, print relative path
+                if pwd in file.resolve().parents:
+                    path = file.resolve().relative_to(pwd)
+                else:
+                    # else print absolute path
+                    path = file.resolve()
+                snippet, line_no = code_for_node(
+                    code, node, class_name, signatures, docs
+                )
+                if replace:
+                    replace_matches.append((file.resolve(), snippet, line_no))
+                    continue
+
+                output_identifier_line = None
+                output_import_line = None
+                symbol_id = None
+
+                if not no_file:
+                    bits = ["# File:", path]
+                    if class_name:
+                        bits.extend(["Class:", class_name])
+                    bits.extend(["Line:", line_no])
+                    symbol_id = "{}:{}".format(path, line_no)
+                    output_identifier_line = " ".join(str(bit) for bit in bits)
+                if imports:
+                    import_line = import_line_for_function(
+                        node.name, path, sys_paths or directories
+                    )
+                    # If it's a class then output '# from x import Class' instead
+                    if class_name:
+                        import_line = (
+                            import_line.split(" import ")[0] + " import " + class_name
+                        )
+                    symbol_id = import_line
+                    output_import_line = "# " + import_line
+
+                yield Output(
+                    symbol_id, output_identifier_line, output_import_line, snippet
+                )
+
+    if sum(output_formats) == 0:
+        for item in stuff_to_output():
+            if item.output_identifier_line:
+                click.echo(item.output_identifier_line)
+            if item.output_import_line:
+                click.echo(item.output_import_line)
+            click.echo(item.snippet)
             click.echo()
+    else:
+        # Do the fancy output formats thing
+        to_output(
+            sys.stdout,
+            ((id_prefix + item.symbol_id, item.snippet) for item in stuff_to_output()),
+            format="csv" if csv_ else "tsv" if tsv else "json" if json_ else "nl",
+        )
+        return
+
     if count:
         click.echo(num_matches)
 
@@ -541,3 +611,38 @@ def is_subpath(path: pathlib.Path, parent: pathlib.Path) -> bool:
 
 def is_dunder(name):
     return name.startswith("__") and name.endswith("__")
+
+
+def to_output(
+    fp: TextIO,
+    lines: Iterable[Tuple[str, str]],
+    format: Literal["csv", "tsv", "json", "nl"] = "csv",
+) -> None:
+    if format == "nl":
+        for id, content in lines:
+            line = json.dumps({"id": id, "code": content})
+            fp.write(line + "\n")
+        return
+
+    elif format == "json":
+        fp.write("[")
+        first = True
+        for id, content in lines:
+            line = json.dumps({"id": id, "code": content})
+            if first:
+                fp.write(line)
+                first = False
+            else:
+                fp.write(",\n " + line)
+        fp.write("]\n")
+        return
+
+    dialect = "excel" if format == "csv" else "excel-tab"
+    writer = csv.writer(fp, dialect=dialect)
+
+    # Write header
+    writer.writerow(["id", "code"])
+
+    # Write content
+    for id, content in lines:
+        writer.writerow([id, content])

@@ -292,6 +292,42 @@ Or to count every async test function:
 ```bash
 symbex --async 'test_*' --count
 ```
+## Structured output
+
+LLM defaults to outputting plain text (actually valid Python code, thanks to the way it uses comments).
+
+You can request output in CSV, TSV, JSON or newline-delimited JSON instead, using the following options:
+
+- `--json`: a JSON array, `[{"id": "...", "code": "..."}]`
+- `--nl`: newline-delimited JSON, `{"id": "...", "code": "..."}` per line
+- `--csv`: CSV with `id,code` as the heading row
+- `--tsv`: TSV with `id\tcode` as the heading row
+
+In each case the ID will be the path to the file containing the symbol, followed by a colon, followed by the line number of the symbol, for example:
+
+```json
+{
+  "id": "symbex/lib.py:82",
+  "code": "def match(name: str, symbols: Iterable[str]) -> bool:"
+}
+```
+If you pass `-i/--imports` the ID will be the import line instead:
+```json
+{
+  "id": "from symbex.lib import match",
+  "code": "def match(name: str, symbols: Iterable[str]) -> bool:"
+}
+```
+Pass `--id-prefix 'something:'` to add the specified prefix to the start of each ID.
+
+This example will generate a CSV file of all of your test functions, using the import style of IDs and a prefix of `test:`:
+
+```bash
+symbex 'test_*' \
+  --function \
+  --imports \
+  --csv > tests.csv
+```
 
 ## Using with LLM
 
