@@ -554,6 +554,11 @@ Options:
   --check                    Exit with non-zero code if any matches found
   --replace                  Replace matching symbol with text from stdin
   --rexec TEXT               Replace with the result of piping to this tool
+  --csv                      Output as CSV
+  --tsv                      Output as TSV
+  --json                     Output as JSON
+  --nl                       Output as newline-delimited JSON
+  --id-prefix TEXT           Prefix to use for symbol IDs
   --help                     Show this message and exit.
 
 ```
