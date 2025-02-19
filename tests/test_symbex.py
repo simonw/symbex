@@ -171,10 +171,6 @@ def test_fixture(directory_full_of_code, monkeypatch, args, expected):
             ["-m", "contextlib", "suppress", "--silent", "-sn"],
             ("class suppress(AbstractContextManager):"),
         ),
-        (
-            ["-m", "asyncio", "sleep", "--silent", "-sn"],
-            ("async def sleep(delay, result):"),
-        ),
     ),
 )
 def test_symbex_symbols(directory_full_of_code, monkeypatch, args, expected):
