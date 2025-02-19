@@ -640,6 +640,10 @@ def cli(
         )
     )
 
+    if count:
+        click.echo(len(results))
+        return
+
     if sum(output_formats) == 0:
         # Regular output: print identifier lines (if any) and snippets.
         for item in results:
@@ -657,9 +661,6 @@ def cli(
             format=fmt,
         )
         return
-
-    if count:
-        click.echo(len(results))
 
     if check and len(results) > 0:
         sys.exit(1)
