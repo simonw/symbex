@@ -396,7 +396,7 @@ def cli(
         for directory in directories:
             for path in pathlib.Path(directory).rglob("*.py"):
                 # Skip if path is inside any of 'excludes'
-                if any(is_subpath(path, exclude) for exclude in excludes):
+                if any(path.resolve().is_relative_to(exclude) for exclude in excludes):
                     continue
                 if path.is_file():
                     yield path

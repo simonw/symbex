@@ -89,6 +89,10 @@ def directory_full_of_code(tmpdir):
             ["baz", "-d", "nested.py", "-x", "nested.py/x/", "--silent"],
             "",
         ),
+        # -x to exclude top level directory
+        (
+            ["baz", "-x", "nested.py", "--silent"], ""
+        ),
         # Classes
         (
             ["MyClass", "--silent"],
