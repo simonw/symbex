@@ -601,14 +601,6 @@ def cli(
         filepath.write_text(new, "utf-8")
 
 
-def is_subpath(path: pathlib.Path, parent: pathlib.Path) -> bool:
-    try:
-        path.relative_to(parent)
-        return True
-    except ValueError:
-        return False
-
-
 def is_dunder(name):
     return name.startswith("__") and name.endswith("__")
 
