@@ -166,10 +166,14 @@ def test_fixture(directory_full_of_code, monkeypatch, args, expected):
                 'def baz(delimiter=", ", type=str):'
             ),
         ),
-        # Test for the --module option
+        # Tests for the --module option
         (
-            ["-m", "pathlib", "Path", "--silent", "-in"],
-            ("# from pathlib import Path\nclass Path(PurePath):"),
+            ["-m", "contextlib", "suppress", "--silent", "-sn"],
+            ("class suppress(AbstractContextManager):"),
+        ),
+        (
+            ["-m", "asyncio", "sleep", "--silent", "-sn"],
+            ("async def sleep(delay, result):"),
         ),
     ),
 )
