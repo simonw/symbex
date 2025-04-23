@@ -645,12 +645,15 @@ def cli(
         return
 
     if sum(output_formats) == 0:
-        # Regular output: print identifier lines (if any) and snippets.
+        # Regular output: print identifier lines (if any) and snippets,
+        # but only repeat the import comment when it actually changes.
+        last_import = None
         for item in results:
             if item.output_identifier_line:
                 click.echo(item.output_identifier_line)
-            if item.output_import_line:
+            if item.output_import_line and item.output_import_line != last_import:
                 click.echo(item.output_import_line)
+                last_import = item.output_import_line
             click.echo(item.snippet)
             click.echo()
     else:
