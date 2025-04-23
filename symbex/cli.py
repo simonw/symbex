@@ -538,11 +538,13 @@ def cli(
                 )
 
     if sum(output_formats) == 0:
+        seen_imports = set()
         for item in stuff_to_output():
             if item.output_identifier_line:
                 click.echo(item.output_identifier_line)
-            if item.output_import_line:
+            if item.output_import_line and item.output_import_line not in seen_imports:
                 click.echo(item.output_import_line)
+                seen_imports.add(item.output_import_line)
             click.echo(item.snippet)
             click.echo()
     else:

@@ -44,3 +44,30 @@ def test_output(extra_args, expected, expected_error):
     else:
         assert result.exit_code == 0
         assert result.output == expected
+
+
+def test_output_class_with_methods():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        open("symbex.py", "w").write(
+            "class Foo:\n"
+            "    def bar(self):\n"
+            "        pass\n"
+            "    def baz(self):\n"
+            "        pass\n"
+        )
+        result = runner.invoke(
+            cli,
+            ["*", "*.*", "--docs", "--imports", "-n"],
+            catch_exceptions=False,
+        )
+    assert result.exit_code == 0
+    assert result.output == (
+        "# from symbex import Foo\n"
+        "class Foo:\n"
+        "\n"
+        "    def bar(self):\n"
+        "\n"
+        "    def baz(self):\n"
+        "\n"
+    )
