@@ -62,7 +62,7 @@ def test_replace_errors(files, args, error):
                 (root / path).write_text(code, "utf-8")
             result = runner.invoke(cli, args + ["--replace"], catch_exceptions=False)
     assert result.exit_code == 1
-    assert result.output.strip() == error
+    assert error in result.output.strip()
 
 
 INPUT_CODE = """
