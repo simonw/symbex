@@ -1,6 +1,6 @@
 [project]
 name = "symbex"
-version = "1.4.1"
+version = "2.0"
 description = "Find the Python code for specified symbols"
 readme = "README.md"
 authors = [{name = "Simon Willison"}]
