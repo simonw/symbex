@@ -1,0 +1,32 @@
+[project]
+name = "symbex"
+version = "2.0"
+description = "Find the Python code for specified symbols"
+readme = "README.md"
+authors = [{name = "Simon Willison"}]
+license = "Apache-2.0"
+requires-python = ">=3.8"
+dependencies = [
+    "click"
+]
+
+[project.urls]
+Homepage = "https://github.com/simonw/symbex"
+Issues = "https://github.com/simonw/symbex/issues"
+CI = "https://github.com/simonw/symbex/actions"
+Changelog = "https://github.com/simonw/symbex/releases"
+
+[project.scripts]
+symbex = "symbex.cli:cli"
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-icdiff", "cogapp", "PyYAML", "ruff"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["symbex"]
+
